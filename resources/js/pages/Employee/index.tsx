@@ -28,19 +28,23 @@ export default function Page({ employees, filters }: Props) {
 
     const { data, setData } = useForm({
         search: filters.search || '',
-    });
-
-    const [selectedType, setSelectedType] = useState<{ filterTypes: number[] }>({
         filterTypes: (filters?.filterTypes || []).map(Number),
     });
 
     const handleKeyDown: KeyboardEventHandler<HTMLInputElement> = (e) => {
         if (e.key === 'Enter') {
-            const queryString = data.search ? { search: data.search } : undefined;
-            router.get(route('employee.index'), queryString, {
-                preserveState: true,
-                preserveScroll: true,
-            });
+            router.get(
+                route('employee.index'),
+                {
+                    search: data.search,
+                    'filterTypes[]': data.filterTypes,
+                },
+                {
+                    preserveState: true,
+                    preserveScroll: true,
+                    replace: true,
+                },
+            );
         }
     };
 
@@ -54,14 +58,13 @@ export default function Page({ employees, filters }: Props) {
     };
 
     const onChangeSelected = (type: number) => {
-        const updatedFilterTypes = selectedType.filterTypes.includes(type)
-            ? selectedType.filterTypes.filter((t) => t !== type)
-            : [...selectedType.filterTypes, type];
+        const updatedFilterTypes = data.filterTypes.includes(type) ? data.filterTypes.filter((t) => t !== type) : [...data.filterTypes, type];
 
-        setSelectedType({ filterTypes: updatedFilterTypes });
+        setData('filterTypes', updatedFilterTypes);
 
         router.get(route('employee.index'), {
-            filterType: updatedFilterTypes,
+            search: data.search,
+            'filterTypes[]': updatedFilterTypes,
             preserveState: true,
             replace: true,
         });
@@ -92,7 +95,7 @@ export default function Page({ employees, filters }: Props) {
                                             Import
                                         </span>
                                     </Button>
-                                    <FilterType setSelectedTypes={onChangeSelected} selectedType={selectedType.filterTypes} />
+                                    <FilterType setSelectedTypes={onChangeSelected} selectedType={data.filterTypes} />
                                 </div>
                                 <div className="flex items-center gap-2">
                                     <Input onKeyDown={handleKeyDown} onChange={handleSearchChange} placeholder="Search..." value={data.search} />

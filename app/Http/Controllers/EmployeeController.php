@@ -12,8 +12,9 @@ class EmployeeController extends Controller
 {
     public function index(Request $request)
     {
+
         $search = $request->input('search');
-        $filterTypes = $request->input('filterType', []);
+        $filterTypes = $request['filterTypes'];
 
 
         $employees = Employee::when($search, function ($query) use ($search) {
