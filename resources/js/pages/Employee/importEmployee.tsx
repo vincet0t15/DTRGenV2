@@ -49,7 +49,14 @@ export default function ImportEmployee({ open, setOpen }: Props) {
                     <Input type="file" accept=".xlsx,.xls,.csv" ref={fileInputRef} onChange={handleFileChange} />
 
                     <div className="mt-4 flex justify-end space-x-2">
-                        <Button variant={'destructive'} size={'sm'} className="cursor-pointer rounded-sm" type="button" disabled={processing}>
+                        <Button
+                            onClick={() => setOpen(false)}
+                            variant={'destructive'}
+                            size={'sm'}
+                            className="cursor-pointer rounded-sm"
+                            type="button"
+                            disabled={processing}
+                        >
                             Cancel
                         </Button>
                         <Button size={'sm'} variant="outline" className="cursor-pointer rounded-sm" type="submit" disabled={processing}>
