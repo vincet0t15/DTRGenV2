@@ -1,4 +1,3 @@
-import { Button } from '@/components/ui/button';
 import { Separator } from '@/components/ui/separator';
 import { SidebarTrigger } from '@/components/ui/sidebar';
 interface Props {
@@ -11,7 +10,7 @@ export function SiteHeader({ title }: Props) {
                 <SidebarTrigger className="-ml-1" />
                 <Separator orientation="vertical" className="mx-2 data-[orientation=vertical]:h-4" />
                 <h1 className="text-base font-medium">{title}</h1>
-                <div className="ml-auto flex items-center gap-2">
+                {/* <div className="ml-auto flex items-center gap-2">
                     <Button variant="ghost" asChild size="sm" className="hidden sm:flex">
                         <a
                             href="https://github.com/shadcn-ui/ui/tree/main/apps/v4/app/(examples)/dashboard"
@@ -22,7 +21,7 @@ export function SiteHeader({ title }: Props) {
                             GitHub
                         </a>
                     </Button>
-                </div>
+                </div> */}
             </div>
         </header>
     );
