@@ -9,7 +9,9 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('dashboard', function () {
         return Inertia::render('dashboard');
     })->name('dashboard');
-
+    Route::get('/', function () {
+        return redirect()->route('dashboard');
+    });
     // employee
 
     Route::get('/employee', [EmployeeController::class, 'index'])->name('employee.index');
