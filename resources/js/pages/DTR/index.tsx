@@ -15,6 +15,7 @@ import { IconCircle } from '@tabler/icons-react';
 import dayjs from 'dayjs';
 import { FilterIcon, HardDriveDownload, Printer } from 'lucide-react';
 import { ChangeEventHandler, KeyboardEventHandler, useState } from 'react';
+import ImportLogs from './importLogs';
 import SelectEmployementType from './selectEmployementType';
 const breadcrumbs: BreadcrumbItem[] = [
     {
@@ -29,6 +30,7 @@ interface Props {
     filters: FilterProps;
 }
 export default function DTR({ employmentTypes, employees, filters }: Props) {
+    const [openImport, setOpenImport] = useState(false);
     const [selectedEmployee, setSelectedEmployee] = useState<number[]>([]);
     const isAllSelected = employees.data.every((emp) => selectedEmployee.includes(emp.id));
 
@@ -120,7 +122,7 @@ export default function DTR({ employmentTypes, employees, filters }: Props) {
 
                         <SelectEmployementType value={data?.employment_type_id} onChange={onChangeSelected} employment_types={employmentTypes} />
 
-                        <Button variant="outline" size="sm" className="cursor-pointer">
+                        <Button variant="outline" size="sm" className="cursor-pointer" onClick={() => setOpenImport(true)}>
                             <HardDriveDownload />
                             <span className="rounded-sm lg:inline">Import Logs</span>
                         </Button>
@@ -192,6 +194,7 @@ export default function DTR({ employmentTypes, employees, filters }: Props) {
                     <Pagination data={employees} />
                 </div>
             </div>
+            {openImport && <ImportLogs open={openImport} setOpen={() => setOpenImport(false)} />}
         </AppLayout>
     );
 }

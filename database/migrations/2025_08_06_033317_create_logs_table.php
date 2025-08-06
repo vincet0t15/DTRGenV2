@@ -19,6 +19,7 @@ return new class extends Migration
             $table->integer('data2')->nullable();
             $table->integer('data3')->nullable();
             $table->integer('data4')->nullable();
+            $table->softDeletes();
             $table->timestamps();
         });
     }

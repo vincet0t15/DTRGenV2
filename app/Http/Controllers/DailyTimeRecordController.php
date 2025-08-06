@@ -2,11 +2,13 @@
 
 namespace App\Http\Controllers;
 
+use App\Imports\LogsImport;
 use App\Interface\DTRInterface;
 use App\Models\Employee;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
+use Maatwebsite\Excel\Facades\Excel;
 
 class DailyTimeRecordController extends Controller
 {
@@ -47,7 +49,7 @@ class DailyTimeRecordController extends Controller
 
         // Get previous logs
         $employeesPreviousLogs = Employee::with([
-            'dtrLogs' => fn($query) =>
+            'Logs' => fn($query) =>
             $query->whereBetween('date_time', [$date_from, $date_to])
                 ->orderBy('date_time')
         ])->whereIn('id', $request->employee)
@@ -56,7 +58,7 @@ class DailyTimeRecordController extends Controller
 
         $previousLogs = $employeesPreviousLogs->flatMap(
             fn($employee) =>
-            $employee->dtrLogs->map(fn($log) => [
+            $employee->Logs->map(fn($log) => [
                 'datetime' => $log->date_time,
                 'type' => $log->data2 === 0 ? 'in' : 'out',
             ])
@@ -65,8 +67,10 @@ class DailyTimeRecordController extends Controller
         $PrevTotalIn = $previousLogs->where('type', 'in')->count();
         $PrevTotalOut = $previousLogs->where('type', 'out')->count();
 
-        $year = $request->selectedYear;
-        $month = $request->selectedMonth;
+        // $year = $request->selectedYear;
+        // $month = $request->selectedMonth;
+        $year = 2025;
+        $month = 7;
 
         $start = Carbon::createFromDate($year, $month, 1);
         $end = $start->copy()->endOfMonth();
@@ -74,7 +78,7 @@ class DailyTimeRecordController extends Controller
 
 
         $employees = Employee::with([
-            'dtrLogs' => fn($query) =>
+            'Logs' => fn($query) =>
             $query->whereYear('date_time', $year)
                 ->whereMonth('date_time', $month)
                 ->orderBy('date_time')
@@ -93,12 +97,12 @@ class DailyTimeRecordController extends Controller
         $employeesPreviousLogs = $employeesPreviousLogs->keyBy('id');
 
         foreach ($employees as $employee) {
-            $logsByDate = $employee->dtrLogs->groupBy(fn($log) => Carbon::parse($log->date_time)->toDateString());
+            $logsByDate = $employee->Logs->groupBy(fn($log) => Carbon::parse($log->date_time)->toDateString());
             $records = [];
             $allLogs = collect();
 
 
-            $empPrevLogs = $employeesPreviousLogs[$employee->id]?->dtrLogs ?? collect();
+            $empPrevLogs = $employeesPreviousLogs[$employee->id]?->Logs ?? collect();
             $empPrevLogsArr = $empPrevLogs->map(fn($log) => [
                 'datetime' => $log->date_time,
                 'type' => $log->data2 === 0 ? 'in' : 'out',
@@ -292,8 +296,15 @@ class DailyTimeRecordController extends Controller
             ];
         }
 
-        return Inertia::render('DTR/dtr', [
+        return Inertia::render('DTR/DTR', [
             'dtr' => $allRecords,
         ]);
+    }
+
+    public function importLogs(Request $request)
+    {
+        Excel::import(new LogsImport(), $request->file('file'));
+
+        return redirect()->back()->withSuccess('Logs successfully imported');
     }
 }
