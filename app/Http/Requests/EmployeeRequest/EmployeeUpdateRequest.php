@@ -1,11 +1,10 @@
 <?php
 
-namespace App\Http\Requests\EmploymentType;
+namespace App\Http\Requests\EmployeeRequest;
 
 use Illuminate\Foundation\Http\FormRequest;
-use Illuminate\Validation\Rule;
 
-class EmploymentTypeStoreRequest extends FormRequest
+class EmployeeUpdateRequest extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -23,9 +22,19 @@ class EmploymentTypeStoreRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'employment_type' => [
+            'name' => [
                 'required',
-                Rule::unique('employment_types')->whereNull('deleted_at')
+            ],
+            'fingerprint_id' => [
+                'required',
+            ],
+            'employment_type_id' => [
+                'required',
+                'exists:employment_types,id',
+            ],
+            'office_id' => [
+                'required',
+                'exists:offices,id',
             ],
         ];
     }

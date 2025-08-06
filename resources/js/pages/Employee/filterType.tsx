@@ -7,12 +7,14 @@ import {
     DropdownMenuSeparator,
     DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
+import { EmploymentTypeProps } from '@/types/employmentType';
 import { IconChevronDown, IconLayoutColumns } from '@tabler/icons-react';
 interface Props {
     selectedType: number[];
     setSelectedTypes: (type: number) => void;
+    employment_type: EmploymentTypeProps[];
 }
-export default function FilterType({ selectedType, setSelectedTypes }: Props) {
+export default function FilterType({ selectedType, setSelectedTypes, employment_type }: Props) {
     const toggleType = (type: number) => {
         setSelectedTypes(type);
     };
@@ -29,12 +31,11 @@ export default function FilterType({ selectedType, setSelectedTypes }: Props) {
                 <DropdownMenuContent>
                     <DropdownMenuLabel>Filter Options</DropdownMenuLabel>
                     <DropdownMenuSeparator />
-                    <DropdownMenuCheckboxItem checked={selectedType.includes(1)} onCheckedChange={() => toggleType(1)}>
-                        Plantilla
-                    </DropdownMenuCheckboxItem>
-                    <DropdownMenuCheckboxItem checked={selectedType.includes(0)} onCheckedChange={() => toggleType(0)}>
-                        COS/JOS
-                    </DropdownMenuCheckboxItem>
+                    {employment_type.map((data, index) => (
+                        <DropdownMenuCheckboxItem key={index} checked={selectedType.includes(data.id)} onCheckedChange={() => toggleType(data.id)}>
+                            {data.employment_type}
+                        </DropdownMenuCheckboxItem>
+                    ))}
                 </DropdownMenuContent>
             </DropdownMenu>
         </div>

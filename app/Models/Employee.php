@@ -16,7 +16,7 @@ class Employee extends Model
         'fingerprint_id',
         'name',
         'is_active',
-        'is_permanent'
+        'employment_type_id'
     ];
 
     public function Logs(): HasMany
@@ -27,5 +27,10 @@ class Employee extends Model
     public function office(): BelongsTo
     {
         return $this->belongsTo(Office::class, 'office_id', 'id');
+    }
+
+    public function employmentType(): BelongsTo
+    {
+        return $this->belongsTo(EmploymentType::class, 'employment_type_id', 'id');
     }
 }

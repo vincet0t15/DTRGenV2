@@ -18,6 +18,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
 
     // employee
     Route::get('/employee', [EmployeeController::class, 'index'])->name('employee.index');
+    Route::put('/employee-update/{employeeId}', [EmployeeController::class, 'update'])->name('employee.update');
     Route::post('/employee-import', [EmployeeController::class, 'import'])->name('employee.import');
     Route::put('/employee-update-status/{employee_id}', [EmployeeController::class, 'updateStatus'])->name('employee.update.status');
 
@@ -28,7 +29,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::delete('/offices-destroy/{office}', [OfficeController::class, 'destroy'])->name('office.destroy');
 
     //EMPLOYMENT TYPES
-    Route::get('/employment-types', [EmploymentTypeController::class, 'index'])->name('employment.types.index');
+    Route::get('/employment-types', [EmploymentTypeController::class, 'index'])->name('employment.index');
     Route::post('/employment-types-store', [EmploymentTypeController::class, 'store'])->name('employment.store');
     Route::put('/employment-types-update/{id}', [EmploymentTypeController::class, 'update'])->name('employment.update');
     Route::delete('/employment-types-destroy/{id}', [EmploymentTypeController::class, 'destroy'])->name('employment.destroy');

@@ -62,7 +62,7 @@ export default function OfficeCreate({ open, setOpen }: Props) {
                         </div>
                     </div>
                     <DialogFooter>
-                        <Button className="cursor-pointer" type="submit" disabled={processing} variant={'outline'}>
+                        <Button className="cursor-pointer" type="submit" disabled={processing} variant={'outline'} size={'sm'}>
                             {processing && <LoaderCircle className="h-4 w-4 animate-spin" />}
                             Create
                         </Button>

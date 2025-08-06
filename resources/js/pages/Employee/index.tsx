@@ -1,16 +1,17 @@
-import { AppSidebar } from '@/components/app-sidebar';
 import Pagination from '@/components/paginationData';
-import { SiteHeader } from '@/components/site-header';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { SidebarInset, SidebarProvider } from '@/components/ui/sidebar';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
+import AppLayout from '@/layouts/app-layout';
+import { BreadcrumbItem } from '@/types';
 import { EmployeeProps } from '@/types/employee';
+import { EmploymentTypeProps } from '@/types/employmentType';
 import { FilterProps } from '@/types/filter';
+import { OfficeProps } from '@/types/office';
 import { PaginatedDataResponse } from '@/types/pagination';
-import { router, useForm } from '@inertiajs/react';
+import { Head, router, useForm } from '@inertiajs/react';
 import { IconCircle, IconPlus } from '@tabler/icons-react';
 import { HardDriveDownload } from 'lucide-react';
 import { ChangeEventHandler, KeyboardEventHandler, useState } from 'react';
@@ -18,15 +19,27 @@ import EmployeeDrawer from './EmployeeDrawer';
 import FilterType from './filterType';
 import ImportEmployee from './importEmployee';
 import EmployeeChangeStatus from './status';
+
 interface Props {
     employees: PaginatedDataResponse<EmployeeProps>;
     filters: FilterProps;
+    employmentTypes: EmploymentTypeProps[];
+    offices: OfficeProps[];
 }
-export default function Page({ employees, filters }: Props) {
+const breadcrumbs: BreadcrumbItem[] = [
+    {
+        title: 'Dashboard',
+        href: '#',
+    },
+];
+
+export default function Page({ employees, filters, employmentTypes, offices }: Props) {
     const [openImport, setOpenImport] = useState(false);
     const [openUpdateStatus, setOpenUpdateStatus] = useState(false);
     const [dataToUpdateStatus, setDataToUpdateStatus] = useState<EmployeeProps | null>(null);
     const [openDrawer, setOpenDrawer] = useState(false);
+    const [employeeData, setEmployeeData] = useState<EmployeeProps | null>(null);
+
     const { data, setData } = useForm({
         search: filters.search || '',
         filterTypes: (filters?.filterTypes || []).map(Number),
@@ -72,128 +85,120 @@ export default function Page({ employees, filters }: Props) {
     };
 
     const handleClickName = (data: EmployeeProps) => {
+        setEmployeeData(data);
         setOpenDrawer(true);
     };
 
     return (
-        <SidebarProvider>
-            <AppSidebar variant="inset" />
-            <SidebarInset>
-                <SiteHeader title="Employee" />
-                <div className="flex flex-1 flex-col">
-                    <div className="@container/main flex flex-1 flex-col gap-2">
-                        <div className="flex flex-col gap-4 py-4 md:gap-4 md:py-6">
-                            <div className="flex w-full flex-col gap-2 px-4 sm:flex-row sm:items-center sm:justify-between lg:px-6">
-                                <div className="flex gap-2">
-                                    <Button variant="outline" size="sm" className="cursor-pointer">
-                                        <IconPlus />
-                                        <span className="rounded-sm lg:inline">Employee</span>
-                                    </Button>
-                                    <Button variant="outline" size="sm" className="cursor-pointer">
-                                        <HardDriveDownload />
-                                        <span
-                                            className="rounded-sm lg:inline"
-                                            onClick={() => {
-                                                requestAnimationFrame(() => setOpenImport(true));
-                                            }}
-                                        >
-                                            Import
-                                        </span>
-                                    </Button>
-                                    <FilterType setSelectedTypes={onChangeSelected} selectedType={data.filterTypes} />
-                                </div>
-                                <div className="flex items-center gap-2">
-                                    <Input onKeyDown={handleKeyDown} onChange={handleSearchChange} placeholder="Search..." value={data.search} />
-                                </div>
-                            </div>
+        <AppLayout breadcrumbs={breadcrumbs}>
+            <Head title="Dashboard" />
 
-                            <div className="px-4 lg:px-6">
-                                <div className="w-full space-y-6">
-                                    <div className="w-full overflow-hidden rounded-sm border shadow-sm">
-                                        <Table>
-                                            <TableHeader className="bg-muted">
-                                                <TableRow>
-                                                    <TableHead>Name</TableHead>
-                                                    <TableHead>Fingerprint ID</TableHead>
-                                                    <TableHead>Office</TableHead>
-                                                    <TableHead className="">Status</TableHead>
-                                                    <TableHead className="">Type</TableHead>
-                                                    <TableHead className="text-center">Action</TableHead>
-                                                </TableRow>
-                                            </TableHeader>
-                                            <TableBody>
-                                                {employees.data.length > 0 ? (
-                                                    employees.data.map((employee, index) => (
-                                                        <TableRow key={index} className="text-sm">
-                                                            <TableCell
-                                                                className="cursor-pointer text-sm hover:font-bold hover:underline"
-                                                                onClick={() => handleClickName(employee)}
-                                                            >
-                                                                {employee.name}
-                                                            </TableCell>
-                                                            <TableCell className="text-sm">{employee.fingerprint_id}</TableCell>
-                                                            <TableCell className="text-sm">{employee.office.office_name}</TableCell>
-                                                            <TableCell>
-                                                                {employee.is_active ? (
-                                                                    <Badge variant="outline">
-                                                                        <IconCircle className="fill-green-500 dark:fill-green-400" />
-                                                                        Active
-                                                                    </Badge>
-                                                                ) : (
-                                                                    <Badge variant="outline">
-                                                                        <IconCircle className="dark:fill-orange-700" />
-                                                                        Inactive
-                                                                    </Badge>
-                                                                )}
-                                                            </TableCell>
-
-                                                            <TableCell className="text-sm">
-                                                                {employee.is_permanent ? 'Plantilla' : 'COS/JO'}
-                                                            </TableCell>
-                                                            <TableCell className="text-center text-sm">
-                                                                <div className="flex flex-col items-center justify-center gap-1 sm:flex-row sm:gap-2">
-                                                                    <Label className="cursor-pointer text-green-700 hover:underline">Edit</Label>
-                                                                    <span className="hidden sm:inline">|</span>
-                                                                    <Label
-                                                                        className="cursor-pointer hover:underline"
-                                                                        onClick={() => handleClickUpdateStatus(employee)}
-                                                                    >
-                                                                        {employee.is_active ? (
-                                                                            <span className="text-teal-700">Active</span>
-                                                                        ) : (
-                                                                            <span className="text-orange-400">Inactive</span>
-                                                                        )}
-                                                                    </Label>
-                                                                    <span className="hidden sm:inline">|</span>
-                                                                    <Label className="cursor-pointer text-red-600 hover:underline">Delete</Label>
-                                                                </div>
-                                                            </TableCell>
-                                                        </TableRow>
-                                                    ))
-                                                ) : (
-                                                    <TableRow>
-                                                        <TableCell colSpan={7} className="py-3 text-center text-gray-500">
-                                                            No incoming documents available.
-                                                        </TableCell>
-                                                    </TableRow>
-                                                )}
-                                            </TableBody>
-                                        </Table>
-                                    </div>
-                                    <div>
-                                        <Pagination data={employees} />
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
+            <div className="flex h-full flex-1 flex-col gap-4 overflow-x-auto rounded-xl p-4">
+                <div className="flex w-full flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
+                    <div className="flex gap-2">
+                        <Button variant="outline" size="sm" className="cursor-pointer">
+                            <IconPlus />
+                            <span className="rounded-sm lg:inline">Employee</span>
+                        </Button>
+                        <Button variant="outline" size="sm" className="cursor-pointer">
+                            <HardDriveDownload />
+                            <span
+                                className="rounded-sm lg:inline"
+                                onClick={() => {
+                                    requestAnimationFrame(() => setOpenImport(true));
+                                }}
+                            >
+                                Import
+                            </span>
+                        </Button>
+                        <FilterType setSelectedTypes={onChangeSelected} selectedType={data.filterTypes} employment_type={employmentTypes} />
+                    </div>
+                    <div className="flex items-center gap-2">
+                        <Input onKeyDown={handleKeyDown} onChange={handleSearchChange} placeholder="Search..." value={data.search} />
                     </div>
                 </div>
-                {openDrawer && <EmployeeDrawer open={openDrawer} setOpen={() => setOpenDrawer(false)} />}
-                {openImport && <ImportEmployee open={openImport} setOpen={() => setOpenImport(false)} />}
-                {openUpdateStatus && dataToUpdateStatus && (
-                    <EmployeeChangeStatus open={openUpdateStatus} setOpen={() => setOpenUpdateStatus(false)} dataToChange={dataToUpdateStatus} />
-                )}
-            </SidebarInset>
-        </SidebarProvider>
+
+                <div className="w-full overflow-hidden rounded-sm border shadow-sm">
+                    <Table>
+                        <TableHeader className="bg-muted">
+                            <TableRow>
+                                <TableHead>Name</TableHead>
+                                <TableHead>Fingerprint ID</TableHead>
+                                <TableHead>Office</TableHead>
+                                <TableHead className="">Status</TableHead>
+                                <TableHead className="">Type</TableHead>
+                                <TableHead className="text-center">Action</TableHead>
+                            </TableRow>
+                        </TableHeader>
+                        <TableBody>
+                            {employees.data.length > 0 ? (
+                                employees.data.map((employee, index) => (
+                                    <TableRow key={index} className="text-sm">
+                                        <TableCell
+                                            className="cursor-pointer text-sm hover:font-bold hover:underline"
+                                            onClick={() => handleClickName(employee)}
+                                        >
+                                            {employee.name}
+                                        </TableCell>
+                                        <TableCell className="text-sm">{employee.fingerprint_id}</TableCell>
+                                        <TableCell className="text-sm">{employee.office.office_name}</TableCell>
+                                        <TableCell>
+                                            {employee.is_active ? (
+                                                <Badge variant="outline">
+                                                    <IconCircle className="fill-green-500 dark:fill-green-400" />
+                                                    Active
+                                                </Badge>
+                                            ) : (
+                                                <Badge variant="outline">
+                                                    <IconCircle className="dark:fill-orange-700" />
+                                                    Inactive
+                                                </Badge>
+                                            )}
+                                        </TableCell>
+
+                                        <TableCell className="text-sm">{employee.employment_type.employment_type}</TableCell>
+                                        <TableCell className="text-center text-sm">
+                                            <div className="flex flex-col items-center justify-center gap-1 sm:flex-row sm:gap-2">
+                                                <Label className="cursor-pointer hover:underline" onClick={() => handleClickUpdateStatus(employee)}>
+                                                    {employee.is_active ? (
+                                                        <span className="text-teal-700">Active</span>
+                                                    ) : (
+                                                        <span className="text-orange-400">Inactive</span>
+                                                    )}
+                                                </Label>
+                                                <span className="hidden sm:inline">|</span>
+                                                <Label className="cursor-pointer text-red-600 hover:underline">Delete</Label>
+                                            </div>
+                                        </TableCell>
+                                    </TableRow>
+                                ))
+                            ) : (
+                                <TableRow>
+                                    <TableCell colSpan={7} className="py-3 text-center text-gray-500">
+                                        No incoming documents available.
+                                    </TableCell>
+                                </TableRow>
+                            )}
+                        </TableBody>
+                    </Table>
+                </div>
+                <div>
+                    <Pagination data={employees} />
+                </div>
+            </div>
+            {openDrawer && employeeData && (
+                <EmployeeDrawer
+                    offices={offices}
+                    employmentTypes={employmentTypes}
+                    open={openDrawer}
+                    setOpen={() => setOpenDrawer(false)}
+                    employeeData={employeeData}
+                />
+            )}
+            {openImport && <ImportEmployee open={openImport} setOpen={() => setOpenImport(false)} />}
+            {openUpdateStatus && dataToUpdateStatus && (
+                <EmployeeChangeStatus open={openUpdateStatus} setOpen={() => setOpenUpdateStatus(false)} dataToChange={dataToUpdateStatus} />
+            )}
+        </AppLayout>
     );
 }

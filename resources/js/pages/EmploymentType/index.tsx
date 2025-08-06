@@ -10,6 +10,9 @@ import { PaginatedDataResponse } from '@/types/pagination';
 import { Head, router, useForm } from '@inertiajs/react';
 import { IconPlus } from '@tabler/icons-react';
 import { ChangeEventHandler, KeyboardEventHandler, useState } from 'react';
+import { CreateEmploymentType } from './create';
+import DeleteEmploymentType from './delete';
+import { EditEmploymentType } from './edit';
 const breadcrumbs: BreadcrumbItem[] = [
     {
         title: 'Employment Types',
@@ -33,7 +36,7 @@ export default function EmploymentTypeIndex({ employmentTypes, filters }: Props)
     const handleKeyDown: KeyboardEventHandler<HTMLInputElement> = (e) => {
         if (e.key === 'Enter') {
             const queryString = data.search ? { search: data.search } : undefined;
-            router.get(route('office.index'), queryString, {
+            router.get(route('employment.index'), queryString, {
                 preserveState: true,
                 preserveScroll: true,
             });
@@ -73,9 +76,8 @@ export default function EmploymentTypeIndex({ employmentTypes, filters }: Props)
                     <Table>
                         <TableHeader className="bg-muted">
                             <TableRow>
-                                <TableHead>Name</TableHead>
-                                <TableHead>Code</TableHead>
-                                <TableHead></TableHead>
+                                <TableHead>Employment Type</TableHead>
+                                <TableHead className="w-25"></TableHead>
                             </TableRow>
                         </TableHeader>
                         <TableBody>
@@ -110,6 +112,11 @@ export default function EmploymentTypeIndex({ employmentTypes, filters }: Props)
                     <Pagination data={employmentTypes} />
                 </div>
             </div>
+            {openCreate && <CreateEmploymentType open={openCreate} setOpen={() => setOpenCreate(false)} />}
+            {openEdit && dataToEdit && <EditEmploymentType open={openEdit} setOpen={() => setOpenEdit(false)} dataToEdit={dataToEdit} />}
+            {openDelete && dataToDelete && (
+                <DeleteEmploymentType open={openDelete} setOpen={() => setOpenDelete(false)} dataToDelete={dataToDelete} />
+            )}
         </AppLayout>
     );
 }

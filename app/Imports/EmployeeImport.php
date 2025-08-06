@@ -21,7 +21,7 @@ class EmployeeImport implements ToCollection, WithHeadingRow
                     'name' => $row['name'],
                     'office_id' => $row['office_id'] ?? null,
                     'is_active' => $row['is_active'] ?? null,
-                    'is_permanent' => $row['is_permanent'] ?? null,
+                    'employment_type_id' => $row['employment_type_id'] ?? null,
                 ];
             }
         }

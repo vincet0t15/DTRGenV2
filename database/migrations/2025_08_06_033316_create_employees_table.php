@@ -17,7 +17,7 @@ return new class extends Migration
             $table->uuid('fingerprint_id');
             $table->string('name');
             $table->boolean('is_active')->default(false)->nullable();
-            $table->boolean('is_permanent')->default(false)->nullable();
+            $table->foreignId('employment_type_id')->constrained('employment_types')->cascadeOnDelete();
             $table->softDeletes();
             $table->timestamps();
         });

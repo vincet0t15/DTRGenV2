@@ -2,8 +2,12 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\EmployeeRequest\EmployeeUpdateRequest;
+use App\Http\Requests\EmployeeRequest\EmployeeUpdteRequest;
 use App\Imports\EmployeeImport;
 use App\Models\Employee;
+use App\Models\EmploymentType;
+use App\Models\Office;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
 use Maatwebsite\Excel\Facades\Excel;
@@ -16,20 +20,28 @@ class EmployeeController extends Controller
         $search = $request->input('search');
         $filterTypes = $request['filterTypes'];
 
+        $employmentTypes = EmploymentType::all();
+        $offices = Office::all();
 
         $employees = Employee::when($search, function ($query) use ($search) {
-            $query->where('name', 'like', '%' . $search . '%');
+            $query->where('name', 'like', '%' . $search . '%')
+                ->orWhere('fingerprint_id', 'like', '%' . $search . '%');
         })
             ->when(!empty($filterTypes), function ($query) use ($filterTypes) {
-                $query->whereIn('is_permanent', $filterTypes);
+                $query->whereHas('employmentType', function ($query) use ($filterTypes) {
+                    $query->whereIn('employment_type_id', $filterTypes);
+                });
             })
-            ->with('office')
+            ->with('office', 'employmentType')
             ->orderBy('name', 'asc')
             ->paginate(100)
             ->withQueryString();
 
+
         return Inertia::render('Employee/index', [
             'employees' => $employees,
+            'employmentTypes' => $employmentTypes,
+            'offices' => $offices,
             'filters' => [
                 'search' => $search,
                 'filterTypes' => $filterTypes,
@@ -51,5 +63,17 @@ class EmployeeController extends Controller
         $employee->save();
 
         return redirect()->back()->with('success', 'Status updated.');
+    }
+
+    public function update(EmployeeUpdateRequest $request, int $employeeId)
+    {
+        $employee = Employee::findOrFail($employeeId);
+        $employee->name = $request->name;
+        $employee->fingerprint_id = $request->fingerprint_id;
+        $employee->employment_type_id = $request->employment_type_id;
+        $employee->office_id = $request->office_id;
+        $employee->save();
+
+        return redirect()->back()->with('success', 'Employee successfully updated.');
     }
 }
