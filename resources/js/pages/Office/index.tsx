@@ -101,7 +101,7 @@ export default function OfficeIndex({ offices, filters }: Props) {
                             ) : (
                                 <TableRow>
                                     <TableCell colSpan={7} className="py-3 text-center text-gray-500">
-                                        No incoming documents available.
+                                        No data available.
                                     </TableCell>
                                 </TableRow>
                             )}
