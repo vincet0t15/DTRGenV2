@@ -5,7 +5,6 @@ import { NavDocuments } from '@/components/nav-documents';
 import { NavMain } from '@/components/nav-main';
 import { NavUser } from '@/components/nav-user';
 import { Sidebar, SidebarContent, SidebarFooter, SidebarHeader, SidebarMenu, SidebarMenuItem } from '@/components/ui/sidebar';
-import { Calendar1Icon } from 'lucide-react';
 
 const data = {
     user: {
@@ -45,18 +44,13 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
         <Sidebar collapsible="offcanvas" {...props}>
             <SidebarHeader>
                 <SidebarMenu>
-                    <SidebarMenuItem>
-                        <a
-                            href="#"
-                            className="flex h-15 items-center gap-3 rounded-lg bg-gradient-to-r from-blue-500 to-purple-600 px-3 py-2 text-white"
-                        >
-                            <Calendar1Icon className="!size-9 text-white" />
-                            <div className="text-sm leading-tight">
-                                <span className="block font-semibold uppercase">Daily Time Record</span>
-                                <span className="block font-semibold tracking-wider">Generator</span>
-                            </div>
-                        </a>
+                    <SidebarMenuItem className="text-center">
+                        <div className="text-sm leading-tight">
+                            <span className="block text-2xl font-semibold uppercase">Daily Time Record</span>
+                            <span className="block text-[16px] font-semibold tracking-wider">Generator</span>
+                        </div>
                     </SidebarMenuItem>
+                    <hr />
                 </SidebarMenu>
             </SidebarHeader>
             <SidebarContent>
