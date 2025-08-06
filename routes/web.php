@@ -38,6 +38,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
 
     // DTR
     Route::get('/dtr', [DailyTimeRecordController::class, 'index'])->name('dtr.index');
+    Route::get('/dtr-print', [DailyTimeRecordController::class, 'print'])->name('dtr.print');
 });
 
 require __DIR__ . '/settings.php';

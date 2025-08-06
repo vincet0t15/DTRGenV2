@@ -5,7 +5,7 @@ import { EmploymentTypeProps } from '@/types/employmentType';
 import { IconChevronDown, IconLayout2 } from '@tabler/icons-react';
 interface Props {
     employment_types: EmploymentTypeProps[];
-    value: number;
+    value: number | null;
     onChange: (value: number) => void;
 }
 export default function SelectEmployementType({ employment_types, value, onChange }: Props) {

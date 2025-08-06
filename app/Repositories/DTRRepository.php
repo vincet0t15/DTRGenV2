@@ -20,8 +20,8 @@ class DTRRepository implements DTRInterface
     public function index($request)
     {
 
-        $search = $request->input('data.search');
-        $employmentTypeId = $request->input('data.employment_type_id');
+        $search = $request->input('search');
+        $employmentTypeId = $request->input('employment_type_id');
 
         $employees = Employee::when($search, function ($query) use ($search) {
             $query->where(function ($q) use ($search) {
@@ -32,6 +32,7 @@ class DTRRepository implements DTRInterface
             ->when($employmentTypeId, function ($query) use ($employmentTypeId) {
                 $query->where('employment_type_id', $employmentTypeId);
             })
+            ->where('is_active', true)
             ->with('office', 'employmentType')
             ->orderBy('name', 'asc')
             ->paginate(100)

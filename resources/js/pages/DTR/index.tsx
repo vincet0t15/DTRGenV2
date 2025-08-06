@@ -1,6 +1,7 @@
 import Pagination from '@/components/paginationData';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
+import { Checkbox } from '@/components/ui/checkbox';
 import { Input } from '@/components/ui/input';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import AppLayout from '@/layouts/app-layout';
@@ -11,8 +12,9 @@ import { FilterProps } from '@/types/filter';
 import { PaginatedDataResponse } from '@/types/pagination';
 import { Head, router, useForm } from '@inertiajs/react';
 import { IconCircle } from '@tabler/icons-react';
-import { FilterIcon } from 'lucide-react';
-import { ChangeEventHandler, KeyboardEventHandler } from 'react';
+import dayjs from 'dayjs';
+import { FilterIcon, Printer } from 'lucide-react';
+import { ChangeEventHandler, KeyboardEventHandler, useState } from 'react';
 import SelectEmployementType from './selectEmployementType';
 const breadcrumbs: BreadcrumbItem[] = [
     {
@@ -27,26 +29,47 @@ interface Props {
     filters: FilterProps;
 }
 export default function DTR({ employmentTypes, employees, filters }: Props) {
-    const { data, setData } = useForm({
+    const [selectedEmployee, setSelectedEmployee] = useState<number[]>([]);
+    const isAllSelected = employees.data.every((emp) => selectedEmployee.includes(emp.id));
+    const { data, setData } = useForm<{
+        search: string;
+        employment_type_id: number | null;
+        date_from: Date | undefined;
+        date_to: Date | undefined;
+        selectedYear: string | null;
+        selectedMonth: string | null;
+    }>({
         search: filters.search || '',
-        employment_type_id: 1, // match key with usage
+        employment_type_id: filters.employment_type_id || 0,
+        date_from: undefined as Date | undefined,
+        date_to: undefined as Date | undefined,
+        selectedYear: filters.selectedYear || '',
+        selectedMonth: filters.selectedMonth || '',
     });
 
     const onChangeSelected = (id: number | 0) => {
-        setData((prev) => ({ ...prev, employment_type_id: id }));
+        const isSameId = data.employment_type_id === id;
+
+        const updatedData = {
+            ...data,
+            employment_type_id: isSameId ? null : id,
+        };
+
+        setData(updatedData);
+
+        router.get(route('dtr.index'), updatedData, {
+            preserveState: true,
+            preserveScroll: true,
+        });
     };
+
     const handleKeyDown: KeyboardEventHandler<HTMLInputElement> = (e) => {
         if (e.key === 'Enter') {
-            router.get(
-                route('dtr.index'),
-                {
-                    data,
-                },
-                {
-                    preserveState: true,
-                    preserveScroll: true,
-                },
-            );
+            router.get(route('dtr.index'), data, {
+                preserveState: true,
+                preserveScroll: true,
+                replace: true,
+            });
         }
     };
 
@@ -54,6 +77,35 @@ export default function DTR({ employmentTypes, employees, filters }: Props) {
         setData('search', e.target.value);
     };
 
+    const toggleSelectAll = () => {
+        if (isAllSelected) {
+            setSelectedEmployee((prev) => prev.filter((id) => !employees.data.some((emp) => emp.id === id)));
+        } else {
+            const idsToAdd = employees.data.map((emp) => emp.id).filter((id) => !selectedEmployee.includes(id));
+
+            setSelectedEmployee((prev) => [...prev, ...idsToAdd]);
+        }
+    };
+
+    const handlClickCheckBox = (id: number) => {
+        const updatedIds = selectedEmployee.includes(id) ? selectedEmployee.filter((idx) => idx !== id) : [...selectedEmployee, id];
+
+        setSelectedEmployee(updatedIds);
+    };
+
+    const handleClickPrint = () => {
+        const formattedDateFrom = data.date_from ? dayjs(data.date_from).format('YYYY-MM-DD') : undefined;
+        const formattedDateTo = data.date_to ? dayjs(data.date_to).format('YYYY-MM-DD') : undefined;
+        const url = route('dtr.print', {
+            employee: selectedEmployee,
+            selectedYear: data.selectedYear,
+            selectedMonth: data.selectedMonth,
+            date_from: formattedDateFrom,
+            date_to: formattedDateTo,
+        });
+
+        window.open(url, '_blank');
+    };
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
             <Head title="DTR" />
@@ -65,7 +117,11 @@ export default function DTR({ employmentTypes, employees, filters }: Props) {
                             <span className="rounded-sm lg:inline">Filter Data</span>
                         </Button>
 
-                        <SelectEmployementType value={data.employment_type_id} onChange={onChangeSelected} employment_types={employmentTypes} />
+                        <SelectEmployementType value={data?.employment_type_id} onChange={onChangeSelected} employment_types={employmentTypes} />
+                        <Button variant="outline" size="sm" className="cursor-pointer" onClick={handleClickPrint}>
+                            <Printer />
+                            <span className="rounded-sm lg:inline">Print DTR</span>
+                        </Button>
                     </div>
                     <div className="flex items-center gap-2">
                         <Input onKeyDown={handleKeyDown} onChange={handleSearchChange} placeholder="Search..." value={data.search} />
@@ -75,6 +131,9 @@ export default function DTR({ employmentTypes, employees, filters }: Props) {
                     <Table>
                         <TableHeader className="bg-muted">
                             <TableRow>
+                                <TableHead className="w-[25px]">
+                                    <Checkbox checked={isAllSelected} onCheckedChange={toggleSelectAll} className="border-white" />
+                                </TableHead>
                                 <TableHead>Name</TableHead>
                                 <TableHead>Fingerprint ID</TableHead>
                                 <TableHead>Office</TableHead>
@@ -86,6 +145,12 @@ export default function DTR({ employmentTypes, employees, filters }: Props) {
                             {employees.data.length > 0 ? (
                                 employees.data.map((employee, index) => (
                                     <TableRow key={index} className="text-sm">
+                                        <TableCell>
+                                            <Checkbox
+                                                checked={selectedEmployee.includes(employee.id)}
+                                                onCheckedChange={() => handlClickCheckBox(employee.id)}
+                                            />
+                                        </TableCell>
                                         <TableCell className="text-sm uppercase">{employee.name}</TableCell>
                                         <TableCell className="text-sm">{employee.fingerprint_id}</TableCell>
                                         <TableCell className="text-sm uppercase">{employee.office.office_name}</TableCell>
