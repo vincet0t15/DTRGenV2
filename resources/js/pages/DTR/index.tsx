@@ -13,7 +13,7 @@ import { PaginatedDataResponse } from '@/types/pagination';
 import { Head, router, useForm } from '@inertiajs/react';
 import { IconCircle } from '@tabler/icons-react';
 import dayjs from 'dayjs';
-import { FilterIcon, Printer } from 'lucide-react';
+import { FilterIcon, HardDriveDownload, Printer } from 'lucide-react';
 import { ChangeEventHandler, KeyboardEventHandler, useState } from 'react';
 import SelectEmployementType from './selectEmployementType';
 const breadcrumbs: BreadcrumbItem[] = [
@@ -31,6 +31,7 @@ interface Props {
 export default function DTR({ employmentTypes, employees, filters }: Props) {
     const [selectedEmployee, setSelectedEmployee] = useState<number[]>([]);
     const isAllSelected = employees.data.every((emp) => selectedEmployee.includes(emp.id));
+
     const { data, setData } = useForm<{
         search: string;
         employment_type_id: number | null;
@@ -118,6 +119,12 @@ export default function DTR({ employmentTypes, employees, filters }: Props) {
                         </Button>
 
                         <SelectEmployementType value={data?.employment_type_id} onChange={onChangeSelected} employment_types={employmentTypes} />
+
+                        <Button variant="outline" size="sm" className="cursor-pointer">
+                            <HardDriveDownload />
+                            <span className="rounded-sm lg:inline">Import Logs</span>
+                        </Button>
+
                         <Button variant="outline" size="sm" className="cursor-pointer" onClick={handleClickPrint}>
                             <Printer />
                             <span className="rounded-sm lg:inline">Print DTR</span>
