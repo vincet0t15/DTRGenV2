@@ -162,13 +162,14 @@
 
 @media print {
     * {
+        /* background-color: white !important; */
         color: black !important;
         -webkit-print-color-adjust: exact;
         print-color-adjust: exact;
         animation: none !important;
         transition: none !important;
+        box-sizing: border-box;
     }
-
     header,
     .header,
     .print-header {
@@ -186,6 +187,7 @@
     @page {
         size: 8.5in 13in;
         margin: 0;
+        background: white;
     }
 
     body {
@@ -194,6 +196,7 @@
         font-size: 10pt; /* optional: makes print smaller */
         height: 13in !important;
         min-height: 13in !important;
+        background-color: white !important;
     }
 
     .page-break {
@@ -215,6 +218,7 @@
         display: flex;
         flex-direction: column;
         justify-content: flex-start;
+        background-color: white !important;
     }
 
     .print-scale-dtr {

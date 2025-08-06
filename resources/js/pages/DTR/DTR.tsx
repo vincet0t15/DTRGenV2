@@ -209,6 +209,7 @@ export default function Dashboard({ dtr }: DashboardProps) {
                                     </div>
 
                                     {/* print only */}
+
                                     <div className="log-columns mt-2 hidden text-[8pt] print:block" style={{ width: '420px', maxWidth: '420px' }}>
                                         <div className="w-[250px] max-w-[250px] border border-black p-1">
                                             {/* Header Info */}
@@ -300,7 +301,7 @@ export default function Dashboard({ dtr }: DashboardProps) {
 
                                 {/* previous logs */}
                                 {(employee.previousLogs?.length ?? 0) > 0 && (
-                                    <div className="w-full max-w-[200px] print:hidden">
+                                    <div className="w-full max-w-[200px] text-black print:hidden">
                                         <span>Previous Logs</span>
                                         <div className="flex flex-col border border-black p-1">
                                             <span className="text-xs font-bold">{employee.employee_name}</span>

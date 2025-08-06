@@ -15,6 +15,7 @@ import { IconCircle } from '@tabler/icons-react';
 import dayjs from 'dayjs';
 import { FilterIcon, HardDriveDownload, Printer } from 'lucide-react';
 import { ChangeEventHandler, KeyboardEventHandler, useState } from 'react';
+import { FilterData } from './filterData';
 import ImportLogs from './importLogs';
 import SelectEmployementType from './selectEmployementType';
 const breadcrumbs: BreadcrumbItem[] = [
@@ -31,6 +32,7 @@ interface Props {
 }
 export default function DTR({ employmentTypes, employees, filters }: Props) {
     const [openImport, setOpenImport] = useState(false);
+    const [openFilterData, setOpenFilterData] = useState(false);
     const [selectedEmployee, setSelectedEmployee] = useState<number[]>([]);
     const isAllSelected = employees.data.every((emp) => selectedEmployee.includes(emp.id));
 
@@ -115,7 +117,7 @@ export default function DTR({ employmentTypes, employees, filters }: Props) {
             <div className="flex h-full flex-1 flex-col gap-4 overflow-x-auto rounded-xl p-4">
                 <div className="flex w-full flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
                     <div className="flex gap-2">
-                        <Button variant="outline" size="sm" className="cursor-pointer">
+                        <Button variant="outline" size="sm" className="cursor-pointer" onClick={() => setOpenFilterData(true)}>
                             <FilterIcon />
                             <span className="rounded-sm lg:inline">Filter Data</span>
                         </Button>
@@ -195,6 +197,7 @@ export default function DTR({ employmentTypes, employees, filters }: Props) {
                 </div>
             </div>
             {openImport && <ImportLogs open={openImport} setOpen={() => setOpenImport(false)} />}
+            {openFilterData && <FilterData open={openFilterData} setOpen={() => setOpenFilterData(false)} />}
         </AppLayout>
     );
 }

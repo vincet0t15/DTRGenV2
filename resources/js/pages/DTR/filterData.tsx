@@ -6,62 +6,15 @@ import { Drawer, DrawerContent, DrawerDescription, DrawerFooter, DrawerHeader, D
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { EmployeeTypes } from '@/types/employee';
-import { EmploymentTypeProps } from '@/types/employmentType';
-import { OfficeProps } from '@/types/office';
 import { useForm } from '@inertiajs/react';
 import { ChangeEventHandler, FormEventHandler } from 'react';
 import { toast } from 'sonner';
-import SelectEmploymentType from './selectEmploymentType';
-import { SelectOffices } from './selectOffice';
 
-const data = [
-    {
-        goal: 400,
-    },
-    {
-        goal: 300,
-    },
-    {
-        goal: 200,
-    },
-    {
-        goal: 300,
-    },
-    {
-        goal: 200,
-    },
-    {
-        goal: 278,
-    },
-    {
-        goal: 189,
-    },
-    {
-        goal: 239,
-    },
-    {
-        goal: 300,
-    },
-    {
-        goal: 200,
-    },
-    {
-        goal: 278,
-    },
-    {
-        goal: 189,
-    },
-    {
-        goal: 349,
-    },
-];
 interface Props {
     open: boolean;
     setOpen: (open: boolean) => void;
-    employmentTypes: EmploymentTypeProps[];
-    offices: OfficeProps[];
 }
-export function CreateEmployee({ open, setOpen, employmentTypes, offices }: Props) {
+export function FilterData({ open, setOpen }: Props) {
     const { data, setData, post, processing, reset, errors } = useForm<EmployeeTypes>({
         name: '',
         fingerprint_id: 0,
@@ -120,17 +73,25 @@ export function CreateEmployee({ open, setOpen, employmentTypes, offices }: Prop
                             </div>
                             <div className="flex flex-col gap-3">
                                 <Label htmlFor="header">Employement Type</Label>
-                                <SelectEmploymentType
-                                    selectedType={data.employment_type_id}
-                                    employment_types={employmentTypes}
-                                    setSelectedTypes={onChangeType}
+                                <Input
+                                    type="number"
+                                    placeholder="Enter fingerprint ID"
+                                    name="fingerprint_id"
+                                    value={data.fingerprint_id}
+                                    onChange={handleInputChange}
                                 />
                                 <InputError message={errors.employment_type_id} />
                             </div>
                         </div>
                         <div className="flex flex-col gap-3">
                             <Label htmlFor="header">Office</Label>
-                            <SelectOffices offices={offices} dataValue={data.office_id} onChange={onChangeOffice} />
+                            <Input
+                                type="number"
+                                placeholder="Enter fingerprint ID"
+                                name="fingerprint_id"
+                                value={data.fingerprint_id}
+                                onChange={handleInputChange}
+                            />
                             <InputError message={errors.office_id} />
                         </div>
                     </form>
