@@ -3,9 +3,9 @@ import { EmploymentTypeProps } from '@/types/employmentType';
 interface Props {
     selectedType?: number;
     setSelectedTypes: (type: number) => void;
-    employment_type: EmploymentTypeProps[];
+    employment_types: EmploymentTypeProps[];
 }
-export default function SelectEmploymentType({ selectedType, setSelectedTypes, employment_type }: Props) {
+export default function SelectEmploymentType({ selectedType, setSelectedTypes, employment_types }: Props) {
     const handleChangeEmploymentType = (type: string) => {
         setSelectedTypes(Number(type));
     };
@@ -17,7 +17,7 @@ export default function SelectEmploymentType({ selectedType, setSelectedTypes, e
                 </SelectTrigger>
                 <SelectContent>
                     <SelectGroup>
-                        {employment_type.map((data, index) => (
+                        {employment_types.map((data, index) => (
                             <SelectItem key={index} value={String(data.id)}>
                                 {data.employment_type}
                             </SelectItem>

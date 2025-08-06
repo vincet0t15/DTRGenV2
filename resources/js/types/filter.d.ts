@@ -7,6 +7,7 @@ export interface FilterProps {
     selectedYear: string;
     type: string;
     filterTypes: number[];
+    employment_type_id: number;
 }
 
 interface MyPageProps extends InertiaPageProps {

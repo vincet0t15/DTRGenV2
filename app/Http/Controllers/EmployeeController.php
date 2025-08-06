@@ -25,13 +25,13 @@ class EmployeeController extends Controller
         $offices = Office::all();
 
         $employees = Employee::when($search, function ($query) use ($search) {
-            $query->where('name', 'like', '%' . $search . '%')
-                ->orWhere('fingerprint_id', 'like', '%' . $search . '%');
+            $query->where(function ($query) use ($search) {
+                $query->where('name', 'like', '%' . $search . '%')
+                    ->orWhere('fingerprint_id', 'like', '%' . $search . '%');
+            });
         })
             ->when(!empty($filterTypes), function ($query) use ($filterTypes) {
-                $query->whereHas('employmentType', function ($query) use ($filterTypes) {
-                    $query->whereIn('employment_type_id', $filterTypes);
-                });
+                $query->whereIn('employment_type_id', $filterTypes);
             })
             ->with('office', 'employmentType')
             ->orderBy('name', 'asc')

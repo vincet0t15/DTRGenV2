@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\DailyTimeRecordController;
 use App\Http\Controllers\EmployeeController;
 use App\Http\Controllers\EmploymentTypeController;
 use App\Http\Controllers\OfficeController;
@@ -34,6 +35,9 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::post('/employment-types-store', [EmploymentTypeController::class, 'store'])->name('employment.store');
     Route::put('/employment-types-update/{id}', [EmploymentTypeController::class, 'update'])->name('employment.update');
     Route::delete('/employment-types-destroy/{id}', [EmploymentTypeController::class, 'destroy'])->name('employment.destroy');
+
+    // DTR
+    Route::get('/dtr', [DailyTimeRecordController::class, 'index'])->name('dtr.index');
 });
 
 require __DIR__ . '/settings.php';

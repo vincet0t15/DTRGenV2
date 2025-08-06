@@ -1,4 +1,4 @@
-import { IconDashboard, IconDatabase, IconListDetails, IconReport } from '@tabler/icons-react';
+import { IconCalendarCheck, IconDashboard, IconDatabase, IconListDetails, IconReport } from '@tabler/icons-react';
 import * as React from 'react';
 
 import { NavDocuments } from '@/components/nav-documents';
@@ -22,6 +22,11 @@ const data = {
             title: 'Employee',
             url: '/employee',
             icon: IconListDetails,
+        },
+        {
+            title: 'Daily Time Record',
+            url: '/dtr',
+            icon: IconCalendarCheck,
         },
     ],
 
