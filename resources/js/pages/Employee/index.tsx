@@ -15,7 +15,9 @@ import { Head, router, useForm } from '@inertiajs/react';
 import { IconCircle, IconPlus } from '@tabler/icons-react';
 import { HardDriveDownload } from 'lucide-react';
 import { ChangeEventHandler, KeyboardEventHandler, useState } from 'react';
-import EmployeeDrawer from './EmployeeDrawer';
+import { CreateEmployee } from './CreateEmployeeDrawer';
+import DeleteEmployee from './delete';
+import EmployeeDrawer from './EditEmployeeDrawer';
 import FilterType from './filterType';
 import ImportEmployee from './importEmployee';
 import EmployeeChangeStatus from './status';
@@ -39,6 +41,8 @@ export default function Page({ employees, filters, employmentTypes, offices }: P
     const [dataToUpdateStatus, setDataToUpdateStatus] = useState<EmployeeProps | null>(null);
     const [openDrawer, setOpenDrawer] = useState(false);
     const [employeeData, setEmployeeData] = useState<EmployeeProps | null>(null);
+    const [openCreate, setOpenCreate] = useState(false);
+    const [openDelete, setOpenDelete] = useState(false);
 
     const { data, setData } = useForm({
         search: filters.search || '',
@@ -89,6 +93,10 @@ export default function Page({ employees, filters, employmentTypes, offices }: P
         setOpenDrawer(true);
     };
 
+    const handleClickDelete = (data: EmployeeProps) => {
+        setEmployeeData(data);
+        setOpenDelete(true);
+    };
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
             <Head title="Dashboard" />
@@ -96,7 +104,7 @@ export default function Page({ employees, filters, employmentTypes, offices }: P
             <div className="flex h-full flex-1 flex-col gap-4 overflow-x-auto rounded-xl p-4">
                 <div className="flex w-full flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
                     <div className="flex gap-2">
-                        <Button variant="outline" size="sm" className="cursor-pointer">
+                        <Button variant="outline" size="sm" className="cursor-pointer" onClick={() => setOpenCreate(true)}>
                             <IconPlus />
                             <span className="rounded-sm lg:inline">Employee</span>
                         </Button>
@@ -135,13 +143,13 @@ export default function Page({ employees, filters, employmentTypes, offices }: P
                                 employees.data.map((employee, index) => (
                                     <TableRow key={index} className="text-sm">
                                         <TableCell
-                                            className="cursor-pointer text-sm hover:font-bold hover:underline"
+                                            className="cursor-pointer text-sm uppercase hover:font-bold hover:underline"
                                             onClick={() => handleClickName(employee)}
                                         >
                                             {employee.name}
                                         </TableCell>
                                         <TableCell className="text-sm">{employee.fingerprint_id}</TableCell>
-                                        <TableCell className="text-sm">{employee.office.office_name}</TableCell>
+                                        <TableCell className="text-sm uppercase">{employee.office.office_name}</TableCell>
                                         <TableCell>
                                             {employee.is_active ? (
                                                 <Badge variant="outline">
@@ -167,7 +175,12 @@ export default function Page({ employees, filters, employmentTypes, offices }: P
                                                     )}
                                                 </Label>
                                                 <span className="hidden sm:inline">|</span>
-                                                <Label className="cursor-pointer text-red-600 hover:underline">Delete</Label>
+                                                <Label
+                                                    className="cursor-pointer text-red-600 hover:underline"
+                                                    onClick={() => handleClickDelete(employee)}
+                                                >
+                                                    Delete
+                                                </Label>
                                             </div>
                                         </TableCell>
                                     </TableRow>
@@ -186,6 +199,10 @@ export default function Page({ employees, filters, employmentTypes, offices }: P
                     <Pagination data={employees} />
                 </div>
             </div>
+            {openCreate && (
+                <CreateEmployee open={openCreate} setOpen={() => setOpenCreate(false)} employmentTypes={employmentTypes} offices={offices} />
+            )}
+
             {openDrawer && employeeData && (
                 <EmployeeDrawer
                     offices={offices}
@@ -199,6 +216,7 @@ export default function Page({ employees, filters, employmentTypes, offices }: P
             {openUpdateStatus && dataToUpdateStatus && (
                 <EmployeeChangeStatus open={openUpdateStatus} setOpen={() => setOpenUpdateStatus(false)} dataToChange={dataToUpdateStatus} />
             )}
+            {openDelete && employeeData && <DeleteEmployee open={openDelete} setOpen={() => setOpenDelete(false)} dataToDelete={employeeData} />}
         </AppLayout>
     );
 }

@@ -24,7 +24,7 @@ class EmployeeStoreRequest extends FormRequest
     {
         return [
             'name' => [
-                'requiredd',
+                'required',
             ],
             'fingerprint_id' => [
                 'required',

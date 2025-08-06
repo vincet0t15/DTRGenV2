@@ -19,9 +19,10 @@ Route::middleware(['auth', 'verified'])->group(function () {
     // employee
     Route::get('/employee', [EmployeeController::class, 'index'])->name('employee.index');
     Route::put('/employee-update/{employeeId}', [EmployeeController::class, 'update'])->name('employee.update');
+    Route::post('/employee-store', [EmployeeController::class, 'store'])->name('employee.store');
     Route::post('/employee-import', [EmployeeController::class, 'import'])->name('employee.import');
     Route::put('/employee-update-status/{employee_id}', [EmployeeController::class, 'updateStatus'])->name('employee.update.status');
-
+    Route::delete('/employee-delete/{employee_id}', [EmployeeController::class, 'destroy'])->name('employee.destroy');
     // OFFICES
     Route::get('/offices', [OfficeController::class, 'index'])->name('office.index');
     Route::post('/offices-store', [OfficeController::class, 'store'])->name('office.store');

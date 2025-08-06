@@ -20,7 +20,6 @@ interface Props {
     offices: OfficeProps[];
 }
 export default function EmployeeDrawer({ open, setOpen, employeeData, employmentTypes, offices }: Props) {
-    console.log(employeeData);
     const { data, setData, put, reset, processing, errors } = useForm<EmployeeTypes>({
         name: employeeData.name || undefined,
         fingerprint_id: employeeData.fingerprint_id || 0,
@@ -52,18 +51,14 @@ export default function EmployeeDrawer({ open, setOpen, employeeData, employment
         });
     };
     return (
-        <div>
-            <Drawer direction={'right'} open={open} onOpenChange={setOpen}>
-                <DrawerContent className="flex h-full flex-col">
-                    <DrawerHeader>
-                        <DrawerTitle>Edit Employee</DrawerTitle>
-                        <DrawerDescription>
-                            Update the employee's information below. Make sure all details are accurate before saving.
-                        </DrawerDescription>
-                    </DrawerHeader>
-
-                    <form onSubmit={submit} className="flex flex-1 flex-col justify-between">
-                        {/* Scrollable content */}
+        <Drawer direction={'right'} open={open} onOpenChange={setOpen}>
+            <DrawerContent>
+                <DrawerHeader>
+                    <DrawerTitle>Edit Employee</DrawerTitle>
+                    <DrawerDescription>Update the employee's information below. Make sure all details are accurate before saving.</DrawerDescription>
+                </DrawerHeader>
+                <div className="flex flex-col gap-4 overflow-y-auto text-sm">
+                    <form className="flex flex-1 flex-col justify-between">
                         <div className="flex-1 overflow-y-auto px-4 pb-4">
                             <div className="flex flex-col gap-4 text-sm">
                                 <div className="flex flex-col gap-3">
@@ -105,16 +100,16 @@ export default function EmployeeDrawer({ open, setOpen, employeeData, employment
                                 </div>
                             </div>
                         </div>
-
-                        <DrawerFooter>
-                            <Button className="cursor-pointer" type="submit" disabled={processing} variant={'outline'} size={'sm'}>
-                                {processing && <LoaderCircle className="h-4 w-4 animate-spin" />}
-                                Create
-                            </Button>
-                        </DrawerFooter>
                     </form>
-                </DrawerContent>
-            </Drawer>
-        </div>
+                </div>
+
+                <DrawerFooter>
+                    <Button className="cursor-pointer" type="submit" disabled={processing} variant={'outline'} size={'sm'} onClick={submit}>
+                        {processing && <LoaderCircle className="h-4 w-4 animate-spin" />}
+                        Update
+                    </Button>
+                </DrawerFooter>
+            </DrawerContent>
+        </Drawer>
     );
 }

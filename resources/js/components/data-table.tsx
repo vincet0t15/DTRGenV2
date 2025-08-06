@@ -42,13 +42,12 @@ import {
     VisibilityState,
 } from '@tanstack/react-table';
 import * as React from 'react';
-import { Area, AreaChart, CartesianGrid, XAxis } from 'recharts';
 import { toast } from 'sonner';
 import { z } from 'zod';
 
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { ChartConfig, ChartContainer, ChartTooltip, ChartTooltipContent } from '@/components/ui/chart';
+import { ChartConfig } from '@/components/ui/chart';
 import { Checkbox } from '@/components/ui/checkbox';
 import {
     Drawer,
@@ -559,7 +558,7 @@ function TableCellViewer({ item }: { item: z.infer<typeof schema> }) {
                 <div className="flex flex-col gap-4 overflow-y-auto px-4 text-sm">
                     {!isMobile && (
                         <>
-                            <ChartContainer config={chartConfig}>
+                            {/* <ChartContainer config={chartConfig}>
                                 <AreaChart
                                     accessibilityLayer
                                     data={chartData}
@@ -595,7 +594,7 @@ function TableCellViewer({ item }: { item: z.infer<typeof schema> }) {
                                         stackId="a"
                                     />
                                 </AreaChart>
-                            </ChartContainer>
+                            </ChartContainer> */}
                             <Separator />
                             <div className="grid gap-2">
                                 <div className="flex gap-2 leading-none font-medium">
@@ -614,7 +613,7 @@ function TableCellViewer({ item }: { item: z.infer<typeof schema> }) {
                             <Label htmlFor="header">Header</Label>
                             <Input id="header" defaultValue={item.header} />
                         </div>
-                        <div className="grid grid-cols-2 gap-4">
+                        {/* <div className="grid grid-cols-2 gap-4">
                             <div className="flex flex-col gap-3">
                                 <Label htmlFor="type">Type</Label>
                                 <Select defaultValue={item.type}>
@@ -669,7 +668,7 @@ function TableCellViewer({ item }: { item: z.infer<typeof schema> }) {
                                     <SelectItem value="Emily Whalen">Emily Whalen</SelectItem>
                                 </SelectContent>
                             </Select>
-                        </div>
+                        </div> */}
                     </form>
                 </div>
                 <DrawerFooter>

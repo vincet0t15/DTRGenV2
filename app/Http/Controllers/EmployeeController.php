@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\EmployeeRequest\EmployeeStoreRequest;
 use App\Http\Requests\EmployeeRequest\EmployeeUpdateRequest;
 use App\Http\Requests\EmployeeRequest\EmployeeUpdteRequest;
 use App\Imports\EmployeeImport;
@@ -75,5 +76,24 @@ class EmployeeController extends Controller
         $employee->save();
 
         return redirect()->back()->with('success', 'Employee successfully updated.');
+    }
+
+    public function store(EmployeeStoreRequest $request)
+    {
+        Employee::create([
+            'name' => $request->name,
+            'fingerprint_id' => $request->fingerprint_id,
+            'office_id' => $request->office_id,
+            'employment_type_id' => $request->employment_type_id,
+        ]);
+
+        return redirect()->back()->with('success', 'Employee successfully added.');
+    }
+
+    public function destroy(int $employeeId)
+    {
+        Employee::findOrFail($employeeId)->delete();
+
+        return redirect()->back()->with('success', 'Employee successfully deleted.');
     }
 }
