@@ -14,6 +14,7 @@ import { router, useForm } from '@inertiajs/react';
 import { IconCircle, IconPlus } from '@tabler/icons-react';
 import { HardDriveDownload } from 'lucide-react';
 import { ChangeEventHandler, KeyboardEventHandler, useState } from 'react';
+import EmployeeDrawer from './EmployeeDrawer';
 import FilterType from './filterType';
 import ImportEmployee from './importEmployee';
 import EmployeeChangeStatus from './status';
@@ -25,7 +26,7 @@ export default function Page({ employees, filters }: Props) {
     const [openImport, setOpenImport] = useState(false);
     const [openUpdateStatus, setOpenUpdateStatus] = useState(false);
     const [dataToUpdateStatus, setDataToUpdateStatus] = useState<EmployeeProps | null>(null);
-
+    const [openDrawer, setOpenDrawer] = useState(false);
     const { data, setData } = useForm({
         search: filters.search || '',
         filterTypes: (filters?.filterTypes || []).map(Number),
@@ -70,6 +71,10 @@ export default function Page({ employees, filters }: Props) {
         });
     };
 
+    const handleClickName = (data: EmployeeProps) => {
+        setOpenDrawer(true);
+    };
+
     return (
         <SidebarProvider>
             <AppSidebar variant="inset" />
@@ -109,6 +114,7 @@ export default function Page({ employees, filters }: Props) {
                                             <TableHeader className="bg-muted">
                                                 <TableRow>
                                                     <TableHead>Name</TableHead>
+                                                    <TableHead>Fingerprint ID</TableHead>
                                                     <TableHead>Office</TableHead>
                                                     <TableHead className="">Status</TableHead>
                                                     <TableHead className="">Type</TableHead>
@@ -119,13 +125,19 @@ export default function Page({ employees, filters }: Props) {
                                                 {employees.data.length > 0 ? (
                                                     employees.data.map((employee, index) => (
                                                         <TableRow key={index} className="text-sm">
-                                                            <TableCell className="text-sm">{employee.name}</TableCell>
+                                                            <TableCell
+                                                                className="cursor-pointer text-sm hover:font-bold hover:underline"
+                                                                onClick={() => handleClickName(employee)}
+                                                            >
+                                                                {employee.name}
+                                                            </TableCell>
+                                                            <TableCell className="text-sm">{employee.fingerprint_id}</TableCell>
                                                             <TableCell className="text-sm">{employee.office.office_name}</TableCell>
                                                             <TableCell>
                                                                 {employee.is_active ? (
                                                                     <Badge variant="outline">
                                                                         <IconCircle className="fill-green-500 dark:fill-green-400" />
-                                                                        Done
+                                                                        Active
                                                                     </Badge>
                                                                 ) : (
                                                                     <Badge variant="outline">
@@ -176,6 +188,7 @@ export default function Page({ employees, filters }: Props) {
                         </div>
                     </div>
                 </div>
+                {openDrawer && <EmployeeDrawer open={openDrawer} setOpen={() => setOpenDrawer(false)} />}
                 {openImport && <ImportEmployee open={openImport} setOpen={() => setOpenImport(false)} />}
                 {openUpdateStatus && dataToUpdateStatus && (
                     <EmployeeChangeStatus open={openUpdateStatus} setOpen={() => setOpenUpdateStatus(false)} dataToChange={dataToUpdateStatus} />
