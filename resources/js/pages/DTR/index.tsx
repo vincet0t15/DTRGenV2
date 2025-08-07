@@ -9,6 +9,7 @@ import { type BreadcrumbItem } from '@/types';
 import { EmployeeProps } from '@/types/employee';
 import { EmploymentTypeProps } from '@/types/employmentType';
 import { FilterProps } from '@/types/filter';
+import { OfficeProps } from '@/types/office';
 import { PaginatedDataResponse } from '@/types/pagination';
 import { Head, router, useForm } from '@inertiajs/react';
 import { IconCircle } from '@tabler/icons-react';
@@ -26,11 +27,12 @@ const breadcrumbs: BreadcrumbItem[] = [
 ];
 
 interface Props {
+    offices: OfficeProps[];
     employees: PaginatedDataResponse<EmployeeProps>;
     employmentTypes: EmploymentTypeProps[];
     filters: FilterProps;
 }
-export default function DTR({ employmentTypes, employees, filters }: Props) {
+export default function DTR({ employmentTypes, employees, filters, offices }: Props) {
     const [openImport, setOpenImport] = useState(false);
     const [openFilterData, setOpenFilterData] = useState(false);
     const [selectedEmployee, setSelectedEmployee] = useState<number[]>([]);
@@ -197,7 +199,9 @@ export default function DTR({ employmentTypes, employees, filters }: Props) {
                 </div>
             </div>
             {openImport && <ImportLogs open={openImport} setOpen={() => setOpenImport(false)} />}
-            {openFilterData && <FilterData open={openFilterData} setOpen={() => setOpenFilterData(false)} />}
+            {openFilterData && (
+                <FilterData open={openFilterData} setOpen={() => setOpenFilterData(false)} offices={offices} employmentTypes={employmentTypes} />
+            )}
         </AppLayout>
     );
 }
