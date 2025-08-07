@@ -25,7 +25,7 @@ const months = [
 
 interface MonthSelectProps {
     value: string;
-    onChange: (value: string) => void;
+    onChange: (value: number) => void;
     placeholder?: string;
     className?: string;
 }
@@ -56,7 +56,7 @@ export function MonthSelect({ value, onChange, placeholder = 'Select month...', 
                                     key={month.value}
                                     value={`${month.value} ${month.label.toLowerCase()}`} // include label for searching
                                     onSelect={() => {
-                                        onChange(month.value);
+                                        onChange(Number(month.value));
                                         setOpen(false);
                                     }}
                                 >

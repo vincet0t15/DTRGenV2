@@ -8,6 +8,7 @@ export interface FilterProps {
     type: string;
     filterTypes: number[];
     employment_type_id: number;
+    office_id: number;
 }
 
 interface MyPageProps extends InertiaPageProps {

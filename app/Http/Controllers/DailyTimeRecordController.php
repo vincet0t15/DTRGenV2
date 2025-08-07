@@ -22,6 +22,7 @@ class DailyTimeRecordController extends Controller
 
     public function index(Request $request)
     {
+
         $data = $this->dTRInterface->index($request);
 
         return Inertia::render('DTR/index', [
@@ -33,6 +34,7 @@ class DailyTimeRecordController extends Controller
                 'filterTypes' => $request->input('filterTypes'),
                 'selectedYear' => $request->input('selectedYear'),
                 'selectedMonth' => $request->input('selectedMonth'),
+                'office_id' => $request->office_id,
             ],
 
 
@@ -70,10 +72,8 @@ class DailyTimeRecordController extends Controller
         $PrevTotalIn = $previousLogs->where('type', 'in')->count();
         $PrevTotalOut = $previousLogs->where('type', 'out')->count();
 
-        // $year = $request->selectedYear;
-        // $month = $request->selectedMonth;
-        $year = 2025;
-        $month = 7;
+        $year = $request->selectedYear;
+        $month = $request->selectedMonth;
 
         $start = Carbon::createFromDate($year, $month, 1);
         $end = $start->copy()->endOfMonth();

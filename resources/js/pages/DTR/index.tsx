@@ -45,6 +45,7 @@ export default function DTR({ employmentTypes, employees, filters, offices }: Pr
         date_to: Date | undefined;
         selectedYear: string | null;
         selectedMonth: string | null;
+        office_id: number | null;
     }>({
         search: filters.search || '',
         employment_type_id: filters.employment_type_id || 0,
@@ -52,6 +53,7 @@ export default function DTR({ employmentTypes, employees, filters, offices }: Pr
         date_to: undefined as Date | undefined,
         selectedYear: filters.selectedYear || '',
         selectedMonth: filters.selectedMonth || '',
+        office_id: filters.office_id || 0,
     });
 
     const onChangeSelected = (id: number | 0) => {
@@ -113,6 +115,27 @@ export default function DTR({ employmentTypes, employees, filters, offices }: Pr
 
         window.open(url, '_blank');
     };
+
+    const onChangeOffice = (officeId: number) => {
+        const newOfficeId = data.office_id === officeId ? null : officeId;
+
+        const updatedData = { ...data, office_id: newOfficeId };
+        setData(updatedData);
+
+        router.get(route('dtr.index'), updatedData, {
+            preserveState: true,
+            preserveScroll: true,
+        });
+    };
+
+    const onChangeMonth = (month: number) => {
+        setData((prev) => ({ ...prev, selectedMonth: String(month) }));
+    };
+
+    const onChangeYear = (year: number) => {
+        setData((prev) => ({ ...prev, selectedYear: String(year) }));
+    };
+
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
             <Head title="DTR" />
@@ -200,7 +223,18 @@ export default function DTR({ employmentTypes, employees, filters, offices }: Pr
             </div>
             {openImport && <ImportLogs open={openImport} setOpen={() => setOpenImport(false)} />}
             {openFilterData && (
-                <FilterData open={openFilterData} setOpen={() => setOpenFilterData(false)} offices={offices} employmentTypes={employmentTypes} />
+                <FilterData
+                    open={openFilterData}
+                    setOpen={() => setOpenFilterData(false)}
+                    offices={offices}
+                    employmentTypes={employmentTypes}
+                    onChangeOffice={onChangeOffice}
+                    selectedOffice={Number(data.office_id)}
+                    onChangeMonth={onChangeMonth}
+                    selectedMonth={Number(data.selectedMonth)}
+                    year={Number(data.selectedYear)}
+                    onChangeYear={onChangeYear}
+                />
             )}
         </AppLayout>
     );

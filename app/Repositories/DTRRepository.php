@@ -22,6 +22,7 @@ class DTRRepository implements DTRInterface
 
         $search = $request->input('search');
         $employmentTypeId = $request->input('employment_type_id');
+        $officeId = $request->office_id;
 
         $employees = Employee::when($search, function ($query) use ($search) {
             $query->where(function ($q) use ($search) {
@@ -31,6 +32,9 @@ class DTRRepository implements DTRInterface
         })
             ->when($employmentTypeId, function ($query) use ($employmentTypeId) {
                 $query->where('employment_type_id', $employmentTypeId);
+            })
+            ->when($officeId, function ($query) use ($officeId) {
+                $query->where('office_id', $officeId);
             })
             ->where('is_active', true)
             ->with('office', 'employmentType')
