@@ -13,7 +13,6 @@ export function TimePicker({ value, onChangeTime }: Props) {
         <div className="flex gap-4">
             <Input
                 value={value}
-                name="test"
                 onChange={handleChange}
                 type="time"
                 id="time-picker"

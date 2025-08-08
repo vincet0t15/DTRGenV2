@@ -35,8 +35,8 @@ class Employee extends Model
         return $this->belongsTo(EmploymentType::class, 'employment_type_id', 'id');
     }
 
-    public function FlexiTime(): HasOne
+    public function flexiTime(): HasOne
     {
-        return $this->hasOne(FlexiTime::class, 'time_in', 'id');
+        return $this->hasOne(FlexiTime::class, 'employee_id', 'id');
     }
 }

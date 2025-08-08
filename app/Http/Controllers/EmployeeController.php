@@ -25,7 +25,7 @@ class EmployeeController extends Controller
         $employmentTypes = EmploymentType::all();
         $offices = Office::all();
 
-        return $employees = Employee::when($search, function ($query) use ($search) {
+        $employees = Employee::when($search, function ($query) use ($search) {
             $query->where(function ($query) use ($search) {
                 $query->where('name', 'like', '%' . $search . '%')
                     ->orWhere('fingerprint_id', 'like', '%' . $search . '%');
@@ -69,6 +69,7 @@ class EmployeeController extends Controller
 
     public function update(EmployeeUpdateRequest $request, int $employeeId)
     {
+
         $employee = Employee::findOrFail($employeeId);
         $employee->name = $request->name;
         $employee->fingerprint_id = $request->fingerprint_id;
@@ -76,14 +77,16 @@ class EmployeeController extends Controller
         $employee->office_id = $request->office_id;
         $employee->save();
 
-        if ($request->flexi_time) {
+        if ($request->flexi_time_in &&  $request->flexi_time_out) {
             FlexiTime::updateOrCreate(
                 [
                     'employee_id' => $employee->id,
                 ],
                 [
-                    'time_in' => $request->time_in
-                ]
+                    'time_in' => $request->flexi_time_in,
+                    'time_out' => $request->flexi_time_out
+                ],
+
             );
         }
         return redirect()->back()->with('success', 'Employee successfully updated.');

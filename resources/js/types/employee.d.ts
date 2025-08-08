@@ -18,5 +18,6 @@ export type EmployeeTypes = {
     fingerprint_id?: number;
     office_id?: number;
     employment_type_id?: number;
-    flexi_time: Time;
+    flexi_time_in: Time;
+    flexi_time_out: Time;
 };

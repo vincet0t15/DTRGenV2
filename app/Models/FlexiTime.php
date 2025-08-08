@@ -11,6 +11,7 @@ class FlexiTime extends Model
 
     protected $fillable  = [
         'employee_id',
-        'time_in'
+        'time_in',
+        'time_out'
     ];
 }

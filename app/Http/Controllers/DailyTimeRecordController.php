@@ -84,7 +84,7 @@ class DailyTimeRecordController extends Controller
                 ->whereMonth('date_time', $month)
                 ->orderBy('date_time')
         ])->whereIn('id', $request->employee)
-            ->with('FlexiTime')
+            ->with('flexiTime')
             ->get();
 
         $allRecords = [];
@@ -228,7 +228,7 @@ class DailyTimeRecordController extends Controller
                     ($dayLogs->count() > 0)
                 ) {
                     // Get employee's flexi time if set, else default to 08:00:00
-                    $flexiTime = $employee->flexiTime?->time_id ?? '08:00:00';
+                    $flexiTime = $employee->flexiTime?->time_in ?? '08:00:00';
                     [$flexHour, $flexMinute] = explode(':', $flexiTime);
 
                     // Expected start times
@@ -278,6 +278,7 @@ class DailyTimeRecordController extends Controller
             $totalOut = $allLogs->where('type', 'out')->count();
 
             $allRecords[] = [
+                'flexiTime' => $employee->flexiTime,
                 'employee_id' => $employee->id,
                 'employee_name' => $employee->name,
                 'records' => $records,

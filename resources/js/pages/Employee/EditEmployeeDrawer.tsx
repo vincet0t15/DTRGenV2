@@ -26,7 +26,8 @@ export default function EmployeeDrawer({ open, setOpen, employeeData, employment
         fingerprint_id: employeeData.fingerprint_id || 0,
         office_id: employeeData.office_id || 0,
         employment_type_id: employeeData.employment_type_id,
-        flexi_time: '',
+        flexi_time_in: '',
+        flexi_time_out: '',
     });
 
     const handleInputChange: ChangeEventHandler<HTMLInputElement> = (e) => {
@@ -53,8 +54,12 @@ export default function EmployeeDrawer({ open, setOpen, employeeData, employment
         });
     };
 
-    const onChangeTime = (time: string) => {
-        setData((prev) => ({ ...prev, flexi_time: time }));
+    const onChangeTimeIn = (time: string) => {
+        setData((prev) => ({ ...prev, flexi_time_in: time }));
+    };
+
+    const onChangeTimeOut = (time: string) => {
+        setData((prev) => ({ ...prev, flexi_time_out: time }));
     };
 
     return (
@@ -113,13 +118,18 @@ export default function EmployeeDrawer({ open, setOpen, employeeData, employment
                                 </div>
                                 <div className="grid grid-cols-2 items-end gap-4">
                                     <div className="flex flex-col gap-3">
-                                        <Label>Time</Label>
-                                        <TimePicker onChangeTime={onChangeTime} value={data.flexi_time} />
+                                        <Label>Time In</Label>
+                                        <TimePicker onChangeTime={onChangeTimeIn} value={data.flexi_time_in} />
                                         <InputError message={errors.fingerprint_id} />
                                     </div>
-                                    <div className="flex flex-col justify-end">
-                                        <Button>Disable</Button>
+                                    <div className="flex flex-col gap-3">
+                                        <Label>Time Out</Label>
+                                        <TimePicker onChangeTime={onChangeTimeOut} value={data.flexi_time_out} />
+                                        <InputError message={errors.fingerprint_id} />
                                     </div>
+                                </div>
+                                <div className="flex flex-col justify-end">
+                                    <Button>Disable</Button>
                                 </div>
                             </div>
                         </div>
