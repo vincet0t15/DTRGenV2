@@ -121,6 +121,42 @@ class DailyTimeRecordController extends Controller
                 $pairs = [];
                 $currentIn = null;
 
+                // --- Night shift handling ---
+                if ($employee->nightShift) {
+                    $nightIn = Carbon::parse($employee->nightShift->time_in);
+                    $nightOut = Carbon::parse($employee->nightShift->time_out);
+
+                    $firstInLog = $dayLogs->first(fn($log) => $log->data2 === 0);
+                    $lastOutLog = $dayLogs->last(fn($log) => $log->data2 === 1);
+
+                    $lateMinutes = 0;
+                    if ($firstInLog) {
+                        $actualIn = Carbon::parse($firstInLog->date_time);
+                        if ($actualIn->greaterThan($nightIn)) {
+                            $lateMinutes = $nightIn->diffInMinutes($actualIn);
+                        }
+                    }
+
+                    $logs = $dayLogs->map(fn($log) => [
+                        'datetime' => $log->date_time,
+                        'type' => $log->data2 === 0 ? 'in' : 'out',
+                    ])->values();
+
+                    $records[] = [
+                        'date' => $dateStr,
+                        'am_in' => $firstInLog ? Carbon::parse($firstInLog->date_time)->format('g:i') : '',
+                        'am_out' => '',
+                        'pm_in' => '',
+                        'pm_out' => $lastOutLog ? Carbon::parse($lastOutLog->date_time)->format('g:i') : '',
+                        'late_minutes' => (int) round($lateMinutes),
+                        'logs' => $logs,
+                        'hasUnmatched' => !$firstInLog || !$lastOutLog,
+                    ];
+
+                    $allLogs = $allLogs->merge($logs);
+                    continue; // Skip regular AM/PM logic
+                }
+
                 foreach ($sortedLogs as $log) {
                     if ($log->data2 === 0) {
                         if ($currentIn === null) {

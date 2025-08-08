@@ -81,8 +81,8 @@ export default function Dashboard({ dtr }: DashboardProps) {
                                             <div className="flex w-full gap-2">
                                                 <span className="whitespace-nowrap italic">(Regular days:</span>
                                                 <div className="flex-1 border-b border-black">
-                                                    {dayjs(employee.flexiTime.time_in, 'HH:mm:ss').format('h:mmA')} -{' '}
-                                                    {dayjs(employee.flexiTime.time_out, 'HH:mm:ss').format('h:mmA')}
+                                                    {dayjs(employee?.flexiTime?.time_in, 'HH:mm:ss').format('h:mmA')} -{' '}
+                                                    {dayjs(employee?.flexiTime?.time_out, 'HH:mm:ss').format('h:mmA')}
                                                 </div>
                                             </div>
                                             <div className="flex w-full gap-2">

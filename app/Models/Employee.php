@@ -39,4 +39,9 @@ class Employee extends Model
     {
         return $this->hasOne(FlexiTime::class, 'employee_id', 'id');
     }
+
+    public function nightShift(): HasOne
+    {
+        return $this->hasOne(NightShift::class, 'employee_id', 'id');
+    }
 }
