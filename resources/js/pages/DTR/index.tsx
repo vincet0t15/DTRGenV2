@@ -160,11 +160,12 @@ export default function DTR({ employmentTypes, employees, filters, offices }: Pr
                             <HardDriveDownload />
                             <span className="rounded-sm lg:inline">Import Logs</span>
                         </Button>
-
-                        <Button variant="outline" size="sm" className="cursor-pointer" onClick={handleClickPrint}>
-                            <Printer />
-                            <span className="rounded-sm lg:inline">Print DTR</span>
-                        </Button>
+                        {data.selectedYear && data.selectedMonth && (
+                            <Button variant="outline" size="sm" className="cursor-pointer" onClick={handleClickPrint}>
+                                <Printer />
+                                <span className="rounded-sm lg:inline">Print DTR</span>
+                            </Button>
+                        )}
                     </div>
                     <div className="flex items-center gap-2">
                         <Input onKeyDown={handleKeyDown} onChange={handleSearchChange} placeholder="Search..." value={data.search} />
