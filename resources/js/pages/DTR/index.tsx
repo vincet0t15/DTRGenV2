@@ -105,6 +105,7 @@ export default function DTR({ employmentTypes, employees, filters, offices }: Pr
     const handleClickPrint = () => {
         const formattedDateFrom = data.date_from ? dayjs(data.date_from).format('YYYY-MM-DD') : undefined;
         const formattedDateTo = data.date_to ? dayjs(data.date_to).format('YYYY-MM-DD') : undefined;
+
         const url = route('dtr.print', {
             employee: selectedEmployee,
             selectedYear: data.selectedYear,
@@ -118,7 +119,6 @@ export default function DTR({ employmentTypes, employees, filters, offices }: Pr
 
     const onChangeOffice = (officeId: number) => {
         const newOfficeId = data.office_id === officeId ? null : officeId;
-
         const updatedData = { ...data, office_id: newOfficeId };
         setData(updatedData);
 
@@ -136,6 +136,13 @@ export default function DTR({ employmentTypes, employees, filters, offices }: Pr
         setData((prev) => ({ ...prev, selectedYear: String(year) }));
     };
 
+    const onChangeDateFrom = (from: Date | undefined) => {
+        setData((prev) => ({ ...prev, date_from: from }));
+    };
+
+    const onChangeDateTo = (to: Date | undefined) => {
+        setData((prev) => ({ ...prev, date_to: to }));
+    };
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
             <Head title="DTR" />
@@ -234,6 +241,10 @@ export default function DTR({ employmentTypes, employees, filters, offices }: Pr
                     selectedMonth={Number(data.selectedMonth)}
                     year={Number(data.selectedYear)}
                     onChangeYear={onChangeYear}
+                    onChangeDateFrom={onChangeDateFrom}
+                    valueDateFrom={data.date_from}
+                    onChangeDateTo={onChangeDateTo}
+                    valueDateTo={data.date_to}
                 />
             )}
         </AppLayout>

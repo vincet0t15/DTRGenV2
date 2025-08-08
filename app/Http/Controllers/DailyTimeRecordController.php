@@ -44,11 +44,9 @@ class DailyTimeRecordController extends Controller
     public function print(Request $request)
     {
 
-        // $date_from = $request->date_from;
-        // $date_to = $request->date_to;
 
-        $date_from = Carbon::parse('2025-07-31')->startOfDay();
-        $date_to = Carbon::parse('2025-07-31')->endOfDay();
+        $date_from = Carbon::parse($request->date_from)->startOfDay();
+        $date_to = Carbon::parse($request->date_to)->endOfDay();
 
         $PrevForTheMonth = Carbon::parse($date_from)->format('F j') . '-' . Carbon::parse($date_to)->format('d, Y');
 

@@ -1,5 +1,6 @@
 'use client';
 
+import { DatePicker } from '@/components/custom-date-picker';
 import { MonthSelect } from '@/components/select-month';
 import { Button } from '@/components/ui/button';
 import { Drawer, DrawerContent, DrawerDescription, DrawerFooter, DrawerHeader, DrawerTitle } from '@/components/ui/drawer';
@@ -21,8 +22,26 @@ interface Props {
     selectedMonth: number;
     year: number;
     onChangeYear: (year: number) => void;
+    valueDateFrom?: Date;
+    onChangeDateFrom?: (date: Date | undefined) => void;
+    valueDateTo?: Date;
+    onChangeDateTo?: (date: Date | undefined) => void;
 }
-export function FilterData({ open, setOpen, offices, onChangeOffice, selectedOffice, onChangeMonth, selectedMonth, year, onChangeYear }: Props) {
+export function FilterData({
+    open,
+    setOpen,
+    offices,
+    onChangeOffice,
+    selectedOffice,
+    onChangeMonth,
+    selectedMonth,
+    year,
+    onChangeYear,
+    onChangeDateFrom,
+    valueDateFrom,
+    valueDateTo,
+    onChangeDateTo,
+}: Props) {
     const handleInputChange: ChangeEventHandler<HTMLInputElement> = (e) => {
         const value = Number(e.target.value);
         onChangeYear(value);
@@ -49,6 +68,20 @@ export function FilterData({ open, setOpen, offices, onChangeOffice, selectedOff
                             <div className="flex flex-col gap-3">
                                 <Label htmlFor="header">Year</Label>
                                 <Input type="number" min={1} placeholder="Enter year" value={year === 0 ? '' : year} onChange={handleInputChange} />
+                            </div>
+                        </div>
+                        <hr />
+                        <div>
+                            <Label>Include Previous Logs</Label>
+                            <div className="mt-4 grid grid-cols-2 gap-4">
+                                <div className="flex flex-col gap-3">
+                                    <Label htmlFor="header">From</Label>
+                                    <DatePicker onChange={onChangeDateFrom} value={valueDateFrom} />
+                                </div>
+                                <div className="flex flex-col gap-3">
+                                    <Label htmlFor="header">From</Label>
+                                    <DatePicker onChange={onChangeDateTo} value={valueDateTo} />
+                                </div>
                             </div>
                         </div>
                     </form>

@@ -161,6 +161,15 @@
 }
 
 @media print {
+    * {
+        /* background-color: white !important; */
+        color: black !important;
+        -webkit-print-color-adjust: exact;
+        print-color-adjust: exact;
+        animation: none !important;
+        transition: none !important;
+        box-sizing: border-box;
+    }
     header,
     .header,
     .print-header {
@@ -180,14 +189,7 @@
         margin: 0;
         background: white;
     }
-    html,
-    body {
-        background: #ffffff !important;
-        color: #000000 !important;
-        -webkit-print-color-adjust: exact;
-        print-color-adjust: exact;
-        overflow: visible !important;
-    }
+
     body {
         margin: 0 !important;
         padding: 0 !important;
