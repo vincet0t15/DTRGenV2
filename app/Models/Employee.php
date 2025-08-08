@@ -5,6 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
 class Employee extends Model
@@ -32,5 +33,10 @@ class Employee extends Model
     public function employmentType(): BelongsTo
     {
         return $this->belongsTo(EmploymentType::class, 'employment_type_id', 'id');
+    }
+
+    public function FlexiTime(): HasOne
+    {
+        return $this->hasOne(FlexiTime::class, 'time_in', 'id');
     }
 }

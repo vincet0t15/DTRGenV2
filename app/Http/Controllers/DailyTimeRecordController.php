@@ -83,7 +83,9 @@ class DailyTimeRecordController extends Controller
             $query->whereYear('date_time', $year)
                 ->whereMonth('date_time', $month)
                 ->orderBy('date_time')
-        ])->whereIn('id', $request->employee)->get();
+        ])->whereIn('id', $request->employee)
+            ->with('FlexiTime')
+            ->get();
 
         $allRecords = [];
 
@@ -220,46 +222,38 @@ class DailyTimeRecordController extends Controller
 
                 // Compute late only for weekdays and only if there are logs for the day
                 $lateMinutes = 0;
+
                 if (
                     !in_array($date->dayOfWeek, [Carbon::SATURDAY, Carbon::SUNDAY]) &&
                     ($dayLogs->count() > 0)
                 ) {
-                    $standardAMIn = $date->copy()->setTime(8, 0);
+                    // Get employee's flexi time if set, else default to 08:00:00
+                    $flexiTime = $employee->flexiTime?->time_id ?? '08:00:00';
+                    [$flexHour, $flexMinute] = explode(':', $flexiTime);
+
+                    // Expected start times
+                    $standardAMIn = $date->copy()->setTime((int) $flexHour, (int) $flexMinute);
                     $standardPMIn = $date->copy()->setTime(13, 0);
 
-                    // Check if there are logs in AM and PM sessions
-                    $hasAMLog = $dayLogs->first(function ($log) {
-                        $t = Carbon::parse($log->date_time);
-                        return $t->hour < 13;
-                    }) !== null;
-                    $hasPMLog = $dayLogs->first(function ($log) {
-                        $t = Carbon::parse($log->date_time);
-                        return $t->hour >= 13;
-                    }) !== null;
+                    $hasAMLog = $dayLogs->first(fn($log) => Carbon::parse($log->date_time)->hour < 13) !== null;
+                    $hasPMLog = $dayLogs->first(fn($log) => Carbon::parse($log->date_time)->hour >= 13) !== null;
 
-                    // Only compute late based on actual late arrival, not missing logs
-                    if ($hasAMLog) {
-                        $hasAmIn = !is_null($amIn);
-                        if ($hasAmIn) {
-                            $amIn = $amIn->copy()->seconds(0)->startOfMinute();
-                            $standardAMIn = $standardAMIn->copy()->seconds(0)->startOfMinute();
-                            if ($amIn->greaterThan($standardAMIn)) {
-                                $lateMinutes += $standardAMIn->diffInMinutes($amIn);
-                            }
+                    // Check AM late
+                    if ($hasAMLog && $amIn) {
+                        $amIn = $amIn->copy()->seconds(0)->startOfMinute();
+                        if ($amIn->greaterThan($standardAMIn)) {
+                            $lateMinutes += $standardAMIn->diffInMinutes($amIn);
                         }
                     }
-                    if ($hasPMLog) {
-                        $hasPmIn = !is_null($pmIn);
-                        if ($hasPmIn) {
-                            $pmIn = $pmIn->copy()->seconds(0)->startOfMinute();
-                            $standardPMIn = $standardPMIn->copy()->seconds(0)->startOfMinute();
-                            if ($pmIn->greaterThan($standardPMIn)) {
-                                $lateMinutes += $standardPMIn->diffInMinutes($pmIn);
-                            }
+
+                    // Check PM late
+                    if ($hasPMLog && $pmIn) {
+                        $pmIn = $pmIn->copy()->seconds(0)->startOfMinute();
+                        if ($pmIn->greaterThan($standardPMIn)) {
+                            $lateMinutes += $standardPMIn->diffInMinutes($pmIn);
                         }
                     }
                 }
-
                 $logs = $dayLogs->map(fn($log) => [
                     'datetime' => $log->date_time,
                     'type' => $log->data2 === 0 ? 'in' : 'out',

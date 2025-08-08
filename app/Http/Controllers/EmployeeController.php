@@ -8,6 +8,7 @@ use App\Http\Requests\EmployeeRequest\EmployeeUpdteRequest;
 use App\Imports\EmployeeImport;
 use App\Models\Employee;
 use App\Models\EmploymentType;
+use App\Models\FlexiTime;
 use App\Models\Office;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
@@ -24,7 +25,7 @@ class EmployeeController extends Controller
         $employmentTypes = EmploymentType::all();
         $offices = Office::all();
 
-        $employees = Employee::when($search, function ($query) use ($search) {
+        return $employees = Employee::when($search, function ($query) use ($search) {
             $query->where(function ($query) use ($search) {
                 $query->where('name', 'like', '%' . $search . '%')
                     ->orWhere('fingerprint_id', 'like', '%' . $search . '%');
@@ -33,7 +34,7 @@ class EmployeeController extends Controller
             ->when(!empty($filterTypes), function ($query) use ($filterTypes) {
                 $query->whereIn('employment_type_id', $filterTypes);
             })
-            ->with('office', 'employmentType')
+            ->with('office', 'employmentType', 'FlexiTime')
             ->orderBy('name', 'asc')
             ->paginate(100)
             ->withQueryString();
@@ -75,17 +76,34 @@ class EmployeeController extends Controller
         $employee->office_id = $request->office_id;
         $employee->save();
 
+        if ($request->flexi_time) {
+            FlexiTime::updateOrCreate(
+                [
+                    'employee_id' => $employee->id,
+                ],
+                [
+                    'time_in' => $request->time_in
+                ]
+            );
+        }
         return redirect()->back()->with('success', 'Employee successfully updated.');
     }
 
     public function store(EmployeeStoreRequest $request)
     {
-        Employee::create([
+        $employee =  Employee::create([
             'name' => $request->name,
             'fingerprint_id' => $request->fingerprint_id,
             'office_id' => $request->office_id,
             'employment_type_id' => $request->employment_type_id,
         ]);
+
+        if ($request->flexi_time) {
+            FlexiTime::create([
+                'employee_id' => $employee->id,
+                'time_in' => $request->flexi_time,
+            ]);
+        }
 
         return redirect()->back()->with('success', 'Employee successfully added.');
     }

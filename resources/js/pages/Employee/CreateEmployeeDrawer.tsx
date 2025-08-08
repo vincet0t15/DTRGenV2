@@ -1,6 +1,7 @@
 'use client';
 
 import InputError from '@/components/input-error';
+import { TimePicker } from '@/components/time-picker';
 import { Button } from '@/components/ui/button';
 import { Drawer, DrawerContent, DrawerDescription, DrawerFooter, DrawerHeader, DrawerTitle } from '@/components/ui/drawer';
 import { Input } from '@/components/ui/input';
@@ -67,6 +68,7 @@ export function CreateEmployee({ open, setOpen, employmentTypes, offices }: Prop
         fingerprint_id: 0,
         office_id: 0,
         employment_type_id: 0,
+        flexi_time: '',
     });
 
     const submit: FormEventHandler = (e) => {
@@ -91,6 +93,10 @@ export function CreateEmployee({ open, setOpen, employmentTypes, offices }: Prop
 
     const handleInputChange: ChangeEventHandler<HTMLInputElement> = (e) => {
         setData((prev) => ({ ...prev, [e.target.name]: e.target.value }));
+    };
+
+    const onChangeTime = (time: string) => {
+        setData((prev) => ({ ...prev, flexi_time: time }));
     };
     return (
         <Drawer open={open} onOpenChange={setOpen} direction="right">
@@ -132,6 +138,18 @@ export function CreateEmployee({ open, setOpen, employmentTypes, offices }: Prop
                             <Label htmlFor="header">Office</Label>
                             <SelectOffices offices={offices} dataValue={data.office_id} onChange={onChangeOffice} />
                             <InputError message={errors.office_id} />
+                        </div>
+                        <div>
+                            <hr />
+                        </div>
+                        <div>
+                            <Label className="text-[17px] font-bold">Flexi Time</Label>
+                        </div>
+
+                        <div className="flex flex-col gap-3">
+                            <Label>Time</Label>
+                            <TimePicker onChangeTime={onChangeTime} value={data.flexi_time} />
+                            <InputError message={errors.fingerprint_id} />
                         </div>
                     </form>
                 </div>

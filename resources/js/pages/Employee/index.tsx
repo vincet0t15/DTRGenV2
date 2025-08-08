@@ -36,6 +36,7 @@ const breadcrumbs: BreadcrumbItem[] = [
 ];
 
 export default function Page({ employees, filters, employmentTypes, offices }: Props) {
+    console.log(employees);
     const [openImport, setOpenImport] = useState(false);
     const [openUpdateStatus, setOpenUpdateStatus] = useState(false);
     const [dataToUpdateStatus, setDataToUpdateStatus] = useState<EmployeeProps | null>(null);

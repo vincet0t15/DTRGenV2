@@ -1,4 +1,5 @@
 import InputError from '@/components/input-error';
+import { TimePicker } from '@/components/time-picker';
 import { Button } from '@/components/ui/button';
 import { Drawer, DrawerContent, DrawerDescription, DrawerFooter, DrawerHeader, DrawerTitle } from '@/components/ui/drawer';
 import { Input } from '@/components/ui/input';
@@ -25,6 +26,7 @@ export default function EmployeeDrawer({ open, setOpen, employeeData, employment
         fingerprint_id: employeeData.fingerprint_id || 0,
         office_id: employeeData.office_id || 0,
         employment_type_id: employeeData.employment_type_id,
+        flexi_time: '',
     });
 
     const handleInputChange: ChangeEventHandler<HTMLInputElement> = (e) => {
@@ -50,6 +52,11 @@ export default function EmployeeDrawer({ open, setOpen, employeeData, employment
             },
         });
     };
+
+    const onChangeTime = (time: string) => {
+        setData((prev) => ({ ...prev, flexi_time: time }));
+    };
+
     return (
         <Drawer direction={'right'} open={open} onOpenChange={setOpen}>
             <DrawerContent>
@@ -62,14 +69,14 @@ export default function EmployeeDrawer({ open, setOpen, employeeData, employment
                         <div className="flex-1 overflow-y-auto px-4 pb-4">
                             <div className="flex flex-col gap-4 text-sm">
                                 <div className="flex flex-col gap-3">
-                                    <Label htmlFor="header">Fullname</Label>
+                                    <Label>Fullname</Label>
                                     <Input name="name" value={data.name} onChange={handleInputChange} />
                                     <InputError message={errors.name} />
                                 </div>
 
                                 <div className="grid grid-cols-2 gap-4">
                                     <div className="flex flex-col gap-3">
-                                        <Label htmlFor="header">Fingerprint ID</Label>
+                                        <Label>Fingerprint ID</Label>
                                         <Input name="fingerprint_id" value={data.fingerprint_id} onChange={handleInputChange} />
                                         <InputError message={errors.fingerprint_id} />
                                     </div>
@@ -97,6 +104,22 @@ export default function EmployeeDrawer({ open, setOpen, employeeData, employment
                                     <Label htmlFor="reviewer">Office</Label>
                                     <SelectOffices offices={offices} onChange={onChange} dataValue={data.office_id} />
                                     <InputError message={errors.office_id} />
+                                </div>
+                                <div>
+                                    <hr />
+                                </div>
+                                <div>
+                                    <Label className="text-[17px] font-bold">Flexi Time</Label>
+                                </div>
+                                <div className="grid grid-cols-2 items-end gap-4">
+                                    <div className="flex flex-col gap-3">
+                                        <Label>Time</Label>
+                                        <TimePicker onChangeTime={onChangeTime} value={data.flexi_time} />
+                                        <InputError message={errors.fingerprint_id} />
+                                    </div>
+                                    <div className="flex flex-col justify-end">
+                                        <Button>Disable</Button>
+                                    </div>
                                 </div>
                             </div>
                         </div>
