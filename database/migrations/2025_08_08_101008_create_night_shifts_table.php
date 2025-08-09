@@ -13,9 +13,8 @@ return new class extends Migration
     {
         Schema::create('night_shifts', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('employee_id')->constrained('employees')->cascadeOnDelete();
-            $table->time('time_in')->nullable();
-            $table->time('time_out')->nullable();
+            $table->foreignId('employee_id')->constrained('employees')->cascadeOnDelete()->unique();
+            $table->boolean('is_nightshift')->default(false);
             $table->softDeletes();
             $table->timestamps();
         });

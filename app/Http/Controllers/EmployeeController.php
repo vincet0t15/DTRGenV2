@@ -9,6 +9,7 @@ use App\Imports\EmployeeImport;
 use App\Models\Employee;
 use App\Models\EmploymentType;
 use App\Models\FlexiTime;
+use App\Models\NightShift;
 use App\Models\Office;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
@@ -34,7 +35,7 @@ class EmployeeController extends Controller
             ->when(!empty($filterTypes), function ($query) use ($filterTypes) {
                 $query->whereIn('employment_type_id', $filterTypes);
             })
-            ->with('office', 'employmentType', 'FlexiTime')
+            ->with('office', 'employmentType', 'flexiTime', 'nightShift')
             ->orderBy('name', 'asc')
             ->paginate(100)
             ->withQueryString();
@@ -89,6 +90,12 @@ class EmployeeController extends Controller
 
             );
         }
+
+        NightShift::updateOrCreate(
+            ['employee_id' => $employee->id],
+            ['is_nightshift' => $request->nightShift]
+        );
+
         return redirect()->back()->with('success', 'Employee successfully updated.');
     }
 
@@ -101,12 +108,27 @@ class EmployeeController extends Controller
             'employment_type_id' => $request->employment_type_id,
         ]);
 
-        if ($request->flexi_time) {
-            FlexiTime::create([
-                'employee_id' => $employee->id,
-                'time_in' => $request->flexi_time,
-            ]);
+
+        if ($request->flexi_time_in &&  $request->flexi_time_out) {
+            FlexiTime::updateOrCreate(
+                [
+                    'employee_id' => $employee->id,
+                ],
+                [
+                    'time_in' => $request->flexi_time_in,
+                    'time_out' => $request->flexi_time_out
+                ],
+
+            );
         }
+
+        if ($request->nightShift) {
+            NightShift::updateOrCreate(
+                ['employee_id' => $employee->id],
+                ['is_nightshift' => $request->nightShift]
+            );
+        }
+
 
         return redirect()->back()->with('success', 'Employee successfully added.');
     }

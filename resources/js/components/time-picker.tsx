@@ -17,7 +17,6 @@ export function TimePicker({ value, onChangeTime }: Props) {
                 type="time"
                 id="time-picker"
                 step="60"
-                defaultValue="13:30:00"
                 className="w-full appearance-none bg-background [&::-webkit-calendar-picker-indicator]:hidden [&::-webkit-calendar-picker-indicator]:appearance-none"
             />
         </div>

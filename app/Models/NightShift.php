@@ -11,7 +11,6 @@ class NightShift extends Model
 
     protected $fillable  = [
         'employee_id',
-        'time_in',
-        'time_out'
+        'is_nightshift'
     ];
 }

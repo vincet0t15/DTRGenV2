@@ -5,6 +5,7 @@ import { Drawer, DrawerContent, DrawerDescription, DrawerFooter, DrawerHeader, D
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectGroup, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Switch } from '@/components/ui/switch';
 import { EmployeeProps, EmployeeTypes } from '@/types/employee';
 import { EmploymentTypeProps } from '@/types/employmentType';
 import { OfficeProps } from '@/types/office';
@@ -28,6 +29,7 @@ export default function EmployeeDrawer({ open, setOpen, employeeData, employment
         employment_type_id: employeeData.employment_type_id,
         flexi_time_in: '',
         flexi_time_out: '',
+        nightShift: employeeData.night_shift?.is_nightshift ?? false,
     });
 
     const handleInputChange: ChangeEventHandler<HTMLInputElement> = (e) => {
@@ -44,7 +46,7 @@ export default function EmployeeDrawer({ open, setOpen, employeeData, employment
 
     const submit: FormEventHandler = (e) => {
         e.preventDefault();
-
+        console.log(data);
         put(route('employee.update', employeeData.id), {
             onSuccess: (response: { props: FlashProps }) => {
                 toast.success(response.props.flash?.success);
@@ -130,6 +132,21 @@ export default function EmployeeDrawer({ open, setOpen, employeeData, employment
                                 </div>
                                 <div className="flex flex-col justify-end">
                                     <Button>Disable</Button>
+                                </div>
+                                <div>
+                                    <hr />
+                                </div>
+                                <div>
+                                    <Label className="text-[17px] font-bold">Night Shift</Label>
+                                </div>
+
+                                <div className="flex items-center space-x-2">
+                                    <Switch
+                                        id="night-shift"
+                                        checked={data.nightShift}
+                                        onCheckedChange={(checked) => setData('nightShift', checked)}
+                                    />
+                                    <Label htmlFor="night-shift">{data.nightShift ? 'Night Shift Active' : 'Enable Night Shift'}</Label>
                                 </div>
                             </div>
                         </div>

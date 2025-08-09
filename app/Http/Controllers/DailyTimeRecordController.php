@@ -84,7 +84,7 @@ class DailyTimeRecordController extends Controller
                 ->whereMonth('date_time', $month)
                 ->orderBy('date_time')
         ])->whereIn('id', $request->employee)
-            ->with('flexiTime')
+            ->with('flexiTime', 'nightShift')
             ->get();
 
         $allRecords = [];
@@ -121,7 +121,7 @@ class DailyTimeRecordController extends Controller
                 $pairs = [];
                 $currentIn = null;
 
-                // --- Night shift handling ---
+                // --- Night shift  ---
                 if ($employee->nightShift) {
                     $nightIn = Carbon::parse($employee->nightShift->time_in);
                     $nightOut = Carbon::parse($employee->nightShift->time_out);
@@ -129,13 +129,8 @@ class DailyTimeRecordController extends Controller
                     $firstInLog = $dayLogs->first(fn($log) => $log->data2 === 0);
                     $lastOutLog = $dayLogs->last(fn($log) => $log->data2 === 1);
 
+                    // No late calculation for night shift employees
                     $lateMinutes = 0;
-                    if ($firstInLog) {
-                        $actualIn = Carbon::parse($firstInLog->date_time);
-                        if ($actualIn->greaterThan($nightIn)) {
-                            $lateMinutes = $nightIn->diffInMinutes($actualIn);
-                        }
-                    }
 
                     $logs = $dayLogs->map(fn($log) => [
                         'datetime' => $log->date_time,
@@ -148,13 +143,13 @@ class DailyTimeRecordController extends Controller
                         'am_out' => '',
                         'pm_in' => '',
                         'pm_out' => $lastOutLog ? Carbon::parse($lastOutLog->date_time)->format('g:i') : '',
-                        'late_minutes' => (int) round($lateMinutes),
+                        'late_minutes' => $lateMinutes, // Always 0 for night shift
                         'logs' => $logs,
                         'hasUnmatched' => !$firstInLog || !$lastOutLog,
                     ];
 
                     $allLogs = $allLogs->merge($logs);
-                    continue; // Skip regular AM/PM logic
+                    continue; // Skip rest of day logic
                 }
 
                 foreach ($sortedLogs as $log) {
