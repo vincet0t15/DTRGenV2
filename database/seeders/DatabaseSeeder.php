@@ -2,6 +2,7 @@
 
 namespace Database\Seeders;
 
+use App\Models\EmploymentType;
 use App\Models\Office;
 use App\Models\User;
 // use Illuminate\Database\Console\Seeds\WithoutModelEvents;
@@ -110,5 +111,18 @@ class DatabaseSeeder extends Seeder
         ];
 
         Office::insert($offices);
+
+
+        $employmentTypes = [
+            [
+                'employment_type' => 'PLANTILLA',
+            ],
+
+            [
+                'employment_type' => 'COS/JO',
+            ],
+        ];
+
+        EmploymentType::insert($employmentTypes);
     }
 }
