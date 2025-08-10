@@ -1,5 +1,5 @@
 import dayjs from 'dayjs';
-
+import customParseFormat from 'dayjs/plugin/customParseFormat';
 type LogEntry = {
     datetime: string;
     type: 'in' | 'out';
@@ -33,6 +33,7 @@ type DTRData = {
     PrevTotalIn: number;
     PreveTotalOut: number;
     flexiTime: flexiTime;
+    nightShift: boolean;
 };
 
 type DashboardProps = {
@@ -40,6 +41,7 @@ type DashboardProps = {
 };
 
 export default function Dashboard({ dtr }: DashboardProps) {
+    dayjs.extend(customParseFormat);
     console.log(dtr);
     return (
         <div className="flex flex-col gap-6 bg-white p-4 print:gap-0 print:p-0">
@@ -81,8 +83,26 @@ export default function Dashboard({ dtr }: DashboardProps) {
                                             <div className="flex w-full gap-2">
                                                 <span className="whitespace-nowrap italic">(Regular days:</span>
                                                 <div className="flex-1 border-b border-black">
-                                                    {dayjs(employee?.flexiTime?.time_in, 'HH:mm:ss').format('h:mmA')} -{' '}
-                                                    {dayjs(employee?.flexiTime?.time_out, 'HH:mm:ss').format('h:mmA')}
+                                                    {employee?.flexiTime && (
+                                                        <>
+                                                            <span>
+                                                                {employee?.flexiTime?.time_in
+                                                                    ? dayjs(employee.flexiTime.time_in, 'HH:mm:ss').format('h:mmA')
+                                                                    : '--'}
+                                                            </span>
+                                                            -
+                                                            <span>
+                                                                {employee?.flexiTime?.time_out
+                                                                    ? dayjs(employee.flexiTime.time_out, 'HH:mm:ss').format('h:mmA')
+                                                                    : '--'}
+                                                            </span>
+                                                        </>
+                                                    )}
+                                                    {!employee?.flexiTime && !employee.nightShift && (
+                                                        <div className="">
+                                                            <span>8:00AM</span>-<span>5:00PM</span>
+                                                        </div>
+                                                    )}
                                                 </div>
                                             </div>
                                             <div className="flex w-full gap-2">

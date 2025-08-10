@@ -122,35 +122,31 @@ class DailyTimeRecordController extends Controller
                 $currentIn = null;
 
                 // --- Night shift  ---
-                if ($employee->nightShift) {
-                    $nightIn = Carbon::parse($employee->nightShift->time_in);
-                    $nightOut = Carbon::parse($employee->nightShift->time_out);
-
+                if ($employee->nightShift && $employee->nightShift->is_nightshift) {
                     $firstInLog = $dayLogs->first(fn($log) => $log->data2 === 0);
                     $lastOutLog = $dayLogs->last(fn($log) => $log->data2 === 1);
 
-                    // No late calculation for night shift employees
-                    $lateMinutes = 0;
-
                     $logs = $dayLogs->map(fn($log) => [
                         'datetime' => $log->date_time,
-                        'type' => $log->data2 === 0 ? 'in' : 'out',
+                        'type'     => $log->data2 === 0 ? 'in' : 'out',
                     ])->values();
 
                     $records[] = [
-                        'date' => $dateStr,
-                        'am_in' => $firstInLog ? Carbon::parse($firstInLog->date_time)->format('g:i') : '',
-                        'am_out' => '',
-                        'pm_in' => '',
-                        'pm_out' => $lastOutLog ? Carbon::parse($lastOutLog->date_time)->format('g:i') : '',
-                        'late_minutes' => $lateMinutes, // Always 0 for night shift
-                        'logs' => $logs,
+                        'date'         => $dateStr,
+                        'am_in'        => $firstInLog ? Carbon::parse($firstInLog->date_time)->format('g:i') : '',
+                        'am_out'       => '',
+                        'pm_in'        => '',
+                        'pm_out'       => $lastOutLog ? Carbon::parse($lastOutLog->date_time)->format('g:i') : '',
+                        'late_minutes' => 0, // Always 0 for night shift
+                        'logs'         => $logs,
                         'hasUnmatched' => !$firstInLog || !$lastOutLog,
+                        'night_shift'  => true,
                     ];
 
                     $allLogs = $allLogs->merge($logs);
-                    continue; // Skip rest of day logic
+                    continue;
                 }
+
 
                 foreach ($sortedLogs as $log) {
                     if ($log->data2 === 0) {
@@ -309,6 +305,7 @@ class DailyTimeRecordController extends Controller
             $totalOut = $allLogs->where('type', 'out')->count();
 
             $allRecords[] = [
+                'nightShift' => $employee->nightShift?->is_nightshift,
                 'flexiTime' => $employee->flexiTime,
                 'employee_id' => $employee->id,
                 'employee_name' => $employee->name,
