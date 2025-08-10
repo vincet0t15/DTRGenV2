@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Http\Requests\EmploymentType\EmploymentTypeStoreRequest;
 use App\Http\Requests\EmploymentType\EmploymentTypeUpdateRequest;
 use App\Interface\EmploymentTypeInterface;
+use App\Models\FlexiTime;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
 

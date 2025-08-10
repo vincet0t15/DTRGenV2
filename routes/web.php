@@ -24,6 +24,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::post('/employee-import', [EmployeeController::class, 'import'])->name('employee.import');
     Route::put('/employee-update-status/{employee_id}', [EmployeeController::class, 'updateStatus'])->name('employee.update.status');
     Route::delete('/employee-delete/{employee_id}', [EmployeeController::class, 'destroy'])->name('employee.destroy');
+    Route::delete('/employee-delete-flexitime/{id}', [EmployeeController::class, 'deleteFlexiTime'])->name('employee.delete.flexitime');
     // OFFICES
     Route::get('/offices', [OfficeController::class, 'index'])->name('office.index');
     Route::post('/offices-store', [OfficeController::class, 'store'])->name('office.store');

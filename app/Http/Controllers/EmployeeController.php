@@ -139,4 +139,11 @@ class EmployeeController extends Controller
 
         return redirect()->back()->with('success', 'Employee successfully deleted.');
     }
+
+    public function deleteFlexiTime(int $id)
+    {
+        FlexiTime::findOrFail($id)->delete();
+
+        return redirect()->back()->withSuccess('Flexitime Successfully deleted');
+    }
 }

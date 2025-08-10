@@ -37,7 +37,7 @@ class DTRRepository implements DTRInterface
                 $query->where('office_id', $officeId);
             })
             ->where('is_active', true)
-            ->with('office', 'employmentType')
+            ->with('office', 'employmentType', 'flexiTime')
             ->orderBy('name', 'asc')
             ->paginate(100)
             ->withQueryString();

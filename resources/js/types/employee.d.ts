@@ -2,6 +2,12 @@ import { EmploymentTypeProps } from './employmentType';
 import { NightShiftProps } from './nightShift';
 import { OfficeProps } from './office';
 
+interface FlexiTime {
+    id: number;
+    employee_id: number;
+    time_in: Date;
+    time_out: Date;
+}
 export interface EmployeeProps {
     id: number;
     fingerprint_id: number;
@@ -14,6 +20,7 @@ export interface EmployeeProps {
     employment_type: EmploymentTypeProps;
     night_shift?: NightShiftProps;
     nightShift?: boolean;
+    flexi_time: FlexiTime;
 }
 
 export type EmployeeTypes = {

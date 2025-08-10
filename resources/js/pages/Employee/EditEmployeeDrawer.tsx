@@ -11,8 +11,9 @@ import { EmploymentTypeProps } from '@/types/employmentType';
 import { OfficeProps } from '@/types/office';
 import { useForm } from '@inertiajs/react';
 import { LoaderCircle } from 'lucide-react';
-import { ChangeEventHandler, FormEventHandler } from 'react';
+import { ChangeEventHandler, FormEventHandler, useState } from 'react';
 import { toast } from 'sonner';
+import DeleteFlexiTime from './deleteFlexitime';
 import { SelectOffices } from './selectOffice';
 interface Props {
     open: boolean;
@@ -27,11 +28,12 @@ export default function EmployeeDrawer({ open, setOpen, employeeData, employment
         fingerprint_id: employeeData.fingerprint_id || 0,
         office_id: employeeData.office_id || 0,
         employment_type_id: employeeData.employment_type_id,
-        flexi_time_in: '',
-        flexi_time_out: '',
+        flexi_time_in: employeeData?.flexi_time?.time_in || '',
+        flexi_time_out: employeeData?.flexi_time?.time_out || '',
         nightShift: employeeData.night_shift?.is_nightshift ?? false,
     });
 
+    const [deleteFlexiTime, setDeleteFlexiTime] = useState(false);
     const handleInputChange: ChangeEventHandler<HTMLInputElement> = (e) => {
         setData((prev) => ({ ...prev, [e.target.name]: e.target.value }));
     };
@@ -131,7 +133,9 @@ export default function EmployeeDrawer({ open, setOpen, employeeData, employment
                                     </div>
                                 </div>
                                 <div className="flex flex-col justify-end">
-                                    <Button>Disable</Button>
+                                    <Button disabled={!employeeData.flexi_time} type="button" onClick={() => setDeleteFlexiTime(true)}>
+                                        Disable
+                                    </Button>
                                 </div>
                                 <div>
                                     <hr />
@@ -152,7 +156,7 @@ export default function EmployeeDrawer({ open, setOpen, employeeData, employment
                         </div>
                     </form>
                 </div>
-
+                {deleteFlexiTime && <DeleteFlexiTime open={deleteFlexiTime} setOpen={() => setDeleteFlexiTime(false)} dataToDelete={employeeData} />}
                 <DrawerFooter>
                     <Button className="cursor-pointer" type="submit" disabled={processing} variant={'outline'} size={'sm'} onClick={submit}>
                         {processing && <LoaderCircle className="h-4 w-4 animate-spin" />}

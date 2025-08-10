@@ -42,7 +42,6 @@ type DashboardProps = {
 
 export default function Dashboard({ dtr }: DashboardProps) {
     dayjs.extend(customParseFormat);
-    console.log(dtr);
     return (
         <div className="flex flex-col gap-6 bg-white p-4 print:gap-0 print:p-0">
             {dtr.map((employee, index) => {
