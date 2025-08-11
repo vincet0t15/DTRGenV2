@@ -11,9 +11,9 @@ import {
     DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 import { SidebarMenu, SidebarMenuButton, SidebarMenuItem, useSidebar } from '@/components/ui/sidebar';
+import { useInitials } from '@/hooks/use-initials';
 import { useMobileNavigation } from '@/hooks/use-mobile-navigation';
 import { router } from '@inertiajs/react';
-
 export function NavUser({
     user,
 }: {
@@ -30,7 +30,7 @@ export function NavUser({
         router.post(route('logout'));
         router.flushAll();
     };
-
+    const getInitials = useInitials();
     return (
         <SidebarMenu>
             <SidebarMenuItem>
@@ -39,7 +39,7 @@ export function NavUser({
                         <SidebarMenuButton size="lg" className="data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground">
                             <Avatar className="h-8 w-8 rounded-lg grayscale">
                                 <AvatarImage src={user.avatar} alt={user.name} />
-                                <AvatarFallback className="rounded-lg">CN</AvatarFallback>
+                                <AvatarFallback>{getInitials(user.name)}</AvatarFallback>
                             </Avatar>
                             <div className="grid flex-1 text-left text-sm leading-tight">
                                 <span className="truncate font-medium">{user.name}</span>

@@ -1,17 +1,13 @@
-import { IconCalendarCheck, IconDatabase, IconListDetails, IconReport } from '@tabler/icons-react';
-import * as React from 'react';
-
 import { NavDocuments } from '@/components/nav-documents';
 import { NavMain } from '@/components/nav-main';
 import { NavUser } from '@/components/nav-user';
 import { Sidebar, SidebarContent, SidebarFooter, SidebarHeader, SidebarMenu, SidebarMenuItem } from '@/components/ui/sidebar';
+import type { PageProps as InertiaPageProps } from '@inertiajs/core';
+import { usePage } from '@inertiajs/react';
+import { IconCalendarCheck, IconDatabase, IconListDetails, IconReport } from '@tabler/icons-react';
+import * as React from 'react';
 
 const data = {
-    user: {
-        name: 'shadcn',
-        email: 'm@example.com',
-        avatar: '',
-    },
     navMain: [
         {
             title: 'Employee',
@@ -38,18 +34,29 @@ const data = {
         },
     ],
 };
+interface AuthUser {
+    name: string;
+    email: string;
+    avatar: string;
+}
 
+interface PageProps extends InertiaPageProps {
+    auth: {
+        user: AuthUser;
+    };
+}
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
+    const { auth } = usePage<PageProps>().props;
     return (
         <Sidebar collapsible="offcanvas" {...props}>
             <SidebarHeader>
                 <SidebarMenu>
                     <SidebarMenuItem className="text-center">
                         <div className="text-sm leading-tight">
-                            <span className="block bg-gradient-to-r from-blue-500 via-purple-500 to-pink-500 bg-clip-text text-2xl font-semibold text-transparent uppercase">
+                            <span className="block bg-gradient-to-r from-blue-500 via-purple-500 to-pink-500 bg-clip-text text-2xl font-extrabold text-transparent uppercase">
                                 Daily Time Record
                             </span>
-                            <span className="block bg-gradient-to-r from-blue-500 via-purple-500 to-pink-500 bg-clip-text text-[16px] font-semibold tracking-wider text-transparent">
+                            <span className="block bg-gradient-to-r from-blue-500 via-purple-500 to-pink-500 bg-clip-text text-[16px] font-bold tracking-wider text-transparent uppercase">
                                 Generator
                             </span>
                         </div>
@@ -63,7 +70,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
                 <NavDocuments className="" items={data.documents} />
             </SidebarContent>
             <SidebarFooter>
-                <NavUser user={data.user} />
+                <NavUser user={auth.user} />
             </SidebarFooter>
         </Sidebar>
     );
