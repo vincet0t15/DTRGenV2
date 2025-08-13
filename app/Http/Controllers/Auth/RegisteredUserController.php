@@ -45,7 +45,7 @@ class RegisteredUserController extends Controller
         event(new Registered($user));
 
         // Auth::login($user);
-
-        return redirect()->intended(route('employee.index', absolute: false));
+        return redirect()->back()->withSuccess('User Successfully register');
+        // return redirect()->intended(route('employee.index', absolute: false));
     }
 }
