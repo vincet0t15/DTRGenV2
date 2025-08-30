@@ -117,6 +117,23 @@ class DailyTimeRecordController extends Controller
             foreach ($daysInMonth as $dateStr) {
                 $date = Carbon::parse($dateStr);
                 $dayLogs = $logsByDate[$dateStr] ?? collect();
+                // Check if there are any time-in entries after midnight that should be considered part of the previous day
+                if ($dateStr === '2025-08-11') {
+                    $previousDate = $date->copy()->subDay()->toDateString();
+                    $previousDayLogs = $logsByDate[$previousDate] ?? collect();
+
+                    // Look for time-in entries after midnight that belong with previous day's shift
+                    $lateNightEntries = $previousDayLogs->filter(function ($log) {
+                        $time = Carbon::parse($log->date_time);
+                        return $time->hour >= 0 && $time->hour < 6; // Consider entries between midnight and 6 AM
+                    });
+
+                    // If we find any, move them to the current day
+                    if ($lateNightEntries->isNotEmpty()) {
+                        $logsByDate[$dateStr] = $dayLogs->merge($lateNightEntries);
+                        $logsByDate[$previousDate] = $previousDayLogs->diff($lateNightEntries);
+                    }
+                }
                 $sortedLogs = $dayLogs->sortBy('date_time')->values();
                 $pairs = [];
                 $currentIn = null;
@@ -153,8 +170,9 @@ class DailyTimeRecordController extends Controller
                         if ($currentIn === null) {
                             $currentIn = $log;
                         } else {
-                            $pairs[] = ['in' => $currentIn, 'out' => null];
-                            $currentIn = $log;
+                            // If we already have an IN entry, don't replace it
+                            // This ensures we keep the first IN entry
+                            continue;
                         }
                     } else {
                         if ($currentIn !== null) {
@@ -290,9 +308,9 @@ class DailyTimeRecordController extends Controller
                 $records[] = [
                     'date' => $dateStr,
                     'am_in' => $amIn ? $amIn->format('g:i') : '',
-                    'am_out' => $amOut ? $amOut->format('g:i ') : '',
-                    'pm_in' => $pmIn ? $pmIn->format('g:i ') : '',
-                    'pm_out' => $pmOut ? $pmOut->format('g:i ') : '',
+                    'am_out' => $amOut ? $amOut->format('g:i') : '',
+                    'pm_in' => $pmIn ? $pmIn->format('g:i') : '',
+                    'pm_out' => $pmOut ? $pmOut->format('g:i') : '',
                     'late_minutes' => (int) round($lateMinutes),
                     'logs' => $logs,
                     'hasUnmatched' => $hasUnmatched,

@@ -100,7 +100,6 @@ export default function Page({ employees, filters, employmentTypes, offices }: P
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
             <Head title="Dashboard" />
-
             <div className="flex h-full flex-1 flex-col gap-4 overflow-x-auto rounded-xl p-4">
                 <div className="flex w-full flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
                     <div className="flex gap-2">
@@ -202,7 +201,6 @@ export default function Page({ employees, filters, employmentTypes, offices }: P
             {openCreate && (
                 <CreateEmployee open={openCreate} setOpen={() => setOpenCreate(false)} employmentTypes={employmentTypes} offices={offices} />
             )}
-
             {openDrawer && employeeData && (
                 <EmployeeDrawer
                     offices={offices}
