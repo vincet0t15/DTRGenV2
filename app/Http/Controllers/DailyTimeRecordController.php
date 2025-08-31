@@ -197,17 +197,22 @@ class DailyTimeRecordController extends Controller
                 $amIn = $amOut = $pmIn = $pmOut = null;
                 $amInCandidates = [];
                 $amOutCandidates = [];
-                $inTimes = [];
+                $pmInCandidates = [];
                 $pmOutCandidates = [];
+
+                // Separate all IN and OUT times based on hour
                 foreach ($pairs as $pair) {
                     $inTime = $pair['in'] ? Carbon::parse($pair['in']->date_time) : null;
                     $outTime = $pair['out'] ? Carbon::parse($pair['out']->date_time) : null;
+                    
                     if ($inTime) {
-                        $inTimes[] = $inTime;
                         if ($inTime->hour < 12) {
                             $amInCandidates[] = $inTime;
+                        } else {
+                            $pmInCandidates[] = $inTime;
                         }
                     }
+                    
                     if ($outTime) {
                         if ($outTime->hour < 13) {
                             $amOutCandidates[] = $outTime;
@@ -217,45 +222,57 @@ class DailyTimeRecordController extends Controller
                     }
                 }
 
+                // Assign AM IN (earliest morning entry)
                 if (count($amInCandidates)) {
-                    $amIn = $amInCandidates[0];
+                    $amIn = min($amInCandidates);
                 }
 
+                // Assign AM OUT (latest morning departure, but must be after AM IN)
                 if (count($amOutCandidates)) {
-                    $amOutsAfterIn = $amIn ? array_filter($amOutCandidates, function ($t) use ($amIn) {
-                        return $t->gte($amIn);
-                    }) : $amOutCandidates;
-                    if (count($amOutsAfterIn)) {
-                        $amOut = end($amOutsAfterIn);
-                    } else {
-                        $amOut = end($amOutCandidates);
-                    }
-                }
-
-                if ($amOut && count($inTimes)) {
-                    $pmInCandidates = [];
-                    foreach ($inTimes as $inTime) {
-                        if ($inTime->gt($amOut)) {
-                            $pmInCandidates[] = $inTime;
+                    if ($amIn) {
+                        $validAmOuts = array_filter($amOutCandidates, function ($t) use ($amIn) {
+                            return $t->gte($amIn);
+                        });
+                        if (count($validAmOuts)) {
+                            $amOut = max($validAmOuts);
+                        } else {
+                            // If no valid AM OUT after AM IN, it might be an overnight shift
+                            // In this case, don't assign AM OUT to avoid confusion
+                            $amOut = null;
                         }
-                    }
-                    if (count($pmInCandidates)) {
-                        $pmIn = end($pmInCandidates);
+                    } else {
+                        // If no AM IN, take the latest AM OUT (might be an incomplete entry)
+                        $amOut = max($amOutCandidates);
                     }
                 }
 
+                // Assign PM IN (earliest afternoon entry, but must be after AM OUT if it exists)
+                if (count($pmInCandidates)) {
+                    if ($amOut) {
+                        $validPmIns = array_filter($pmInCandidates, function ($t) use ($amOut) {
+                            return $t->gt($amOut);
+                        });
+                        if (count($validPmIns)) {
+                            $pmIn = min($validPmIns);
+                        }
+                    } else {
+                        // If no AM OUT, take the earliest PM IN
+                        $pmIn = min($pmInCandidates);
+                    }
+                }
+
+                // Assign PM OUT (latest afternoon departure, but must be after PM IN)
                 if (count($pmOutCandidates)) {
                     if ($pmIn) {
-                        $pmOutsAfterIn = array_filter($pmOutCandidates, function ($t) use ($pmIn) {
+                        $validPmOuts = array_filter($pmOutCandidates, function ($t) use ($pmIn) {
                             return $t->gte($pmIn);
                         });
-                        if (count($pmOutsAfterIn)) {
-                            $pmOut = end($pmOutsAfterIn);
-                        } else {
-                            $pmOut = end($pmOutCandidates);
+                        if (count($validPmOuts)) {
+                            $pmOut = max($validPmOuts);
                         }
                     } else {
-                        $pmOut = end($pmOutCandidates);
+                        // If no PM IN, take the latest PM OUT
+                        $pmOut = max($pmOutCandidates);
                     }
                 }
 
