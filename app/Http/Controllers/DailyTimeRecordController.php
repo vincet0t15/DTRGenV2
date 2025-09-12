@@ -4,11 +4,13 @@ namespace App\Http\Controllers;
 
 use App\Imports\LogsImport;
 use App\Interface\DTRInterface;
+use App\Jobs\ProcessLogsImport;
 use App\Models\Employee;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
 use Maatwebsite\Excel\Facades\Excel;
+use Illuminate\Support\Facades\Storage;
 
 class DailyTimeRecordController extends Controller
 {
@@ -36,8 +38,7 @@ class DailyTimeRecordController extends Controller
                 'selectedMonth' => $request->input('selectedMonth'),
                 'office_id' => $request->office_id,
             ],
-
-
+            'notifications' => $data['notifications'] ?? [],
         ]);
     }
 
@@ -204,7 +205,7 @@ class DailyTimeRecordController extends Controller
                 foreach ($pairs as $pair) {
                     $inTime = $pair['in'] ? Carbon::parse($pair['in']->date_time) : null;
                     $outTime = $pair['out'] ? Carbon::parse($pair['out']->date_time) : null;
-                    
+
                     if ($inTime) {
                         if ($inTime->hour < 12) {
                             $amInCandidates[] = $inTime;
@@ -212,7 +213,7 @@ class DailyTimeRecordController extends Controller
                             $pmInCandidates[] = $inTime;
                         }
                     }
-                    
+
                     if ($outTime) {
                         if ($outTime->hour < 13) {
                             $amOutCandidates[] = $outTime;
@@ -362,8 +363,16 @@ class DailyTimeRecordController extends Controller
 
     public function importLogs(Request $request)
     {
-        Excel::import(new LogsImport(), $request->file('file'));
+        $request->validate([
+            'file' => 'required|file|mimes:xlsx,xls,csv'
+        ]);
 
-        return redirect()->back()->withSuccess('Logs successfully imported');
+        // Store the file temporarily
+        $filePath = $request->file('file')->store('temp');
+
+        // Dispatch the job to process the import in the background
+        ProcessLogsImport::dispatch($filePath);
+
+        return redirect()->back()->withSuccess('Import started successfully. Large files are processed in the background and may take several minutes to complete.');
     }
 }

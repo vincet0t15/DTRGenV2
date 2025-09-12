@@ -6,6 +6,7 @@ use App\Interface\DTRInterface;
 use App\Models\Employee;
 use App\Models\EmploymentType;
 use App\Models\Office;
+use Illuminate\Support\Facades\Auth;
 
 class DTRRepository implements DTRInterface
 {
@@ -19,7 +20,6 @@ class DTRRepository implements DTRInterface
 
     public function index($request)
     {
-
         $search = $request->input('search');
         $employmentTypeId = $request->input('employment_type_id');
         $officeId = $request->office_id;
@@ -42,10 +42,17 @@ class DTRRepository implements DTRInterface
             ->paginate(100)
             ->withQueryString();
 
+        // Get user notifications if user is authenticated
+        $notifications = [];
+        if (Auth::check()) {
+            $notifications = Auth::user()->unreadNotifications->toArray();
+        }
+
         return [
             'employees' => $employees,
             'employmentTypes' => EmploymentType::all(),
             'offices' => Office::all(),
+            'notifications' => $notifications,
         ];
     }
 }

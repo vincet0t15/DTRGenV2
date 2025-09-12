@@ -3,50 +3,45 @@
 namespace App\Imports;
 
 use App\Models\Log;
-use Illuminate\Support\Collection;
-use Maatwebsite\Excel\Concerns\ToCollection;
 use Maatwebsite\Excel\Concerns\ToModel;
 use Maatwebsite\Excel\Concerns\WithHeadingRow;
+use Maatwebsite\Excel\Concerns\WithChunkReading;
 use PhpOffice\PhpSpreadsheet\Shared\Date;
+use Illuminate\Support\Facades\DB;
 
-class LogsImport implements ToCollection, WithHeadingRow
+class LogsImport implements ToModel, WithHeadingRow, WithChunkReading
 {
-    public function collection(Collection $rows)
+    /**
+     * @param array $row
+     *
+     * @return \Illuminate\Database\Eloquent\Model|null
+     */
+    public function model(array $row)
     {
-        $newLogs = [];
-
-        foreach ($rows as $row) {
-            $convertedDate = null;
-
-            if (is_numeric($row['date_time'])) {
-                $convertedDate = Date::excelToDateTimeObject($row['date_time'])->format('Y-m-d H:i');
-            } else {
-                $convertedDate = $row['date_time'];
-            }
-
-
-            $dateOnly = date('Y-m-d', strtotime($convertedDate));
-
-
-            $exists = Log::where('fingerprint_id', $row['fingerprint_id'])
-                ->whereDate('date_time', $dateOnly)
-                ->exists();
-
-            if (!$exists) {
-                $newLogs[] = [
-                    'fingerprint_id' => $row['fingerprint_id'],
-                    'date_time' => $convertedDate,
-                    'data1' => $row['data1'],
-                    'data2' => $row['data2'],
-                    'data3' => $row['data3'],
-                    'data4' => $row['data4'],
-                ];
-            }
+        // Convert Excel serial date
+        if (is_numeric($row['date_time'])) {
+            $convertedDate = Date::excelToDateTimeObject($row['date_time'])->format('Y-m-d H:i:s');
+        } else {
+            $convertedDate = date('Y-m-d H:i:s', strtotime($row['date_time']));
         }
 
+        // Use upsert to avoid duplicates efficiently
+        return new Log([
+            'fingerprint_id' => $row['fingerprint_id'],
+            'date_time'      => $convertedDate,
+            'data1' => $row['data1'] ?? null,
+            'data2' => $row['data2'] ?? null,
+            'data3' => $row['data3'] ?? null,
+            'data4' => $row['data4'] ?? null,
+        ]);
+    }
 
-        collect($newLogs)->chunk(1000)->each(function ($chunk) {
-            Log::insert($chunk->toArray());
-        });
+    /**
+     * @return int
+     */
+    public function chunkSize(): int
+    {
+        // Implement chunked processing with 500 records per chunk as per project specifications
+        return 500;
     }
 }

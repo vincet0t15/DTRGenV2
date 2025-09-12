@@ -97,6 +97,7 @@ export default function Page({ employees, filters, employmentTypes, offices }: P
         setEmployeeData(data);
         setOpenDelete(true);
     };
+
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
             <Head title="Dashboard" />

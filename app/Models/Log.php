@@ -19,6 +19,10 @@ class Log extends Model
         'data4'
     ];
 
+    protected $primaryKey = 'id';
+
+    public $timestamps = true;
+
     public function employee(): BelongsTo
     {
         return $this->belongsTo(Employee::class, 'fingerprint_id', 'fingerprint_id');

@@ -160,7 +160,7 @@ export default function DTR({ employmentTypes, employees, filters, offices }: Pr
                             <HardDriveDownload />
                             <span className="rounded-sm lg:inline">Import Logs</span>
                         </Button>
-                        {data.selectedYear && data.selectedMonth && (
+                        {data.selectedYear && data.selectedMonth && selectedEmployee.length > 0 && (
                             <Button variant="outline" size="sm" className="cursor-pointer" onClick={handleClickPrint}>
                                 <Printer />
                                 <span className="rounded-sm lg:inline">Print DTR</span>
