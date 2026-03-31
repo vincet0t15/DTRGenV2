@@ -45,15 +45,15 @@ class LogsImport implements ToModel, WithHeadingRow, WithChunkReading, SkipsEmpt
         // Create a unique key for this record
         $uniqueKey = $row['fingerprint_id'] . '_' . $convertedDate;
 
-        // Check if we've already seen this record in this import batch
+
         if (isset($this->existingRecords[$uniqueKey])) {
             return null;
         }
 
-        // Mark this record as seen
+
         $this->existingRecords[$uniqueKey] = true;
 
-        // Collect data for batch insert
+
         $this->batchData[] = [
             'fingerprint_id' => $row['fingerprint_id'],
             'date_time'      => $convertedDate,
