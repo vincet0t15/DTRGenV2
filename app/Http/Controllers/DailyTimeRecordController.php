@@ -132,12 +132,13 @@ class DailyTimeRecordController extends Controller
         $employeesPreviousLogs = $employeesPreviousLogs->keyBy('id');
 
         foreach ($employees as $employee) {
-            $logsByDate = $employee->Logs->groupBy(fn($log) => Carbon::parse($log->date_time)->toDateString());
+            // Use the deduplicated logs relation (lowercase 'l')
+            $logsByDate = $employee->logs->groupBy(fn($log) => Carbon::parse($log->date_time)->toDateString());
             $records = [];
             $allLogs = collect();
 
 
-            $empPrevLogs = $employeesPreviousLogs[$employee->id]?->Logs ?? collect();
+            $empPrevLogs = $employeesPreviousLogs[$employee->id]?->logs ?? collect();
             $empPrevLogsArr = $empPrevLogs->map(fn($log) => [
                 'datetime' => $log->date_time,
                 'type' => $log->data2 === 0 ? 'in' : 'out',
