@@ -167,20 +167,22 @@ class DailyTimeRecordController extends Controller
 
 
                 foreach ($sortedLogs as $log) {
-                    if ($log->data2 === 0) {
+                    if ($log->data2 === 0) { // IN
                         if ($currentIn === null) {
                             $currentIn = $log;
                         } else {
-                            // If we already have an IN entry, don't replace it
-                            // This ensures we keep the first IN entry
-                            continue;
+                            // If we already have an IN without OUT, create a pair with null OUT
+                            // This handles multiple consecutive INs
+                            $pairs[] = ['in' => $currentIn, 'out' => null];
+                            $currentIn = $log; // Use the new IN
                         }
-                    } else {
+                    } else { // OUT
                         if ($currentIn !== null) {
                             if (Carbon::parse($log->date_time)->gt(Carbon::parse($currentIn->date_time))) {
                                 $pairs[] = ['in' => $currentIn, 'out' => $log];
                                 $currentIn = null;
                             } else {
+                                // OUT is before IN, treat as separate events
                                 $pairs[] = ['in' => $currentIn, 'out' => null];
                                 $pairs[] = ['in' => null, 'out' => $log];
                                 $currentIn = null;
