@@ -66,7 +66,7 @@ class LogsImport implements ToModel, WithHeadingRow, WithChunkReading, SkipsEmpt
     public function rules(): array
     {
         return [
-            'fingerprint_id' => 'required|string',
+            'fingerprint_id' => 'required', // Accepts both string and numeric
             'date_time' => 'required',
         ];
     }
