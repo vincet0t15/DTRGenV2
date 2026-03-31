@@ -11,6 +11,7 @@ use Illuminate\Http\Request;
 use Inertia\Inertia;
 use Maatwebsite\Excel\Facades\Excel;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\DB;
 
 class DailyTimeRecordController extends Controller
 {
@@ -399,13 +400,17 @@ class DailyTimeRecordController extends Controller
             'file' => 'required|file|mimes:xlsx,xls,csv'
         ]);
 
-        Excel::import(new LogsImport(), $request->file('file'));
-        // // Store the file temporarily
-        // $filePath = $request->file('file')->store('temp');
+        // Disable query logging for better performance
+        DB::disableQueryLog();
 
-        // // Dispatch the job to process the import in the background
-        // ProcessLogsImport::dispatch($filePath);
+        try {
+            // Import directly (synchronous for immediate feedback)
+            Excel::import(new LogsImport(), $request->file('file'));
 
-        return redirect()->back()->withSuccess('Import started successfully. Large files are processed in the background and may take several minutes to complete.');
+            return redirect()->back()->withSuccess('Import completed successfully! ' . now()->format('Y-m-d H:i:s'));
+        } catch (\Exception $e) {
+            \Illuminate\Support\Facades\Log::error('Import failed: ' . $e->getMessage());
+            return redirect()->back()->withErrors(['file' => 'Import failed: ' . $e->getMessage()]);
+        }
     }
 }

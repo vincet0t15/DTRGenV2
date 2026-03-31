@@ -11,8 +11,8 @@ use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
 use Illuminate\Support\Facades\Storage;
 use Maatwebsite\Excel\Facades\Excel;
-use Illuminate\Support\Facades\Notification;
-use Illuminate\Notifications\AnonymousNotifiable;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 
 class ProcessLogsImport implements ShouldQueue
 {
@@ -41,17 +41,19 @@ class ProcessLogsImport implements ShouldQueue
     public function handle()
     {
         try {
+            // Disable query logging for better performance
+            DB::disableQueryLog();
+
             // Process the Excel file with chunked reading
             Excel::import(new LogsImport(), $this->filePath);
 
-            // In a real application, you would send a notification to the user
-            // For now, we'll just log it
-            \Log::info('Logs import completed for file: ' . $this->fileName);
+            // Log completion
+            Log::info('Logs import completed for file: ' . $this->fileName);
 
             // Clean up the temporary file
             Storage::disk('local')->delete($this->filePath);
         } catch (\Exception $e) {
-            \Log::error('Logs import failed for file: ' . $this->fileName . '. Error: ' . $e->getMessage());
+            Log::error('Logs import failed for file: ' . $this->fileName . '. Error: ' . $e->getMessage());
             throw $e;
         }
     }
@@ -65,7 +67,7 @@ class ProcessLogsImport implements ShouldQueue
     public function failed(\Throwable $exception)
     {
         // Log the failure
-        \Log::error('Logs import failed for file: ' . $this->fileName . '. Error: ' . $exception->getMessage());
+        Log::error('Logs import failed for file: ' . $this->fileName . '. Error: ' . $exception->getMessage());
 
         // In a real application, you would send a failure notification to the user
     }
