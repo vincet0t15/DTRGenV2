@@ -60,6 +60,21 @@ class DailyTimeRecordController extends Controller
             ->where('is_active', true)
             ->get();
 
+        // Remove exact duplicate logs from previous logs
+        foreach ($employeesPreviousLogs as $employee) {
+            $employee->setRelation(
+                'logs',
+                $employee->Logs->unique(function ($log) {
+                    return $log->fingerprint_id . '_' .
+                        $log->date_time . '_' .
+                        $log->data1 . '_' .
+                        $log->data2 . '_' .
+                        $log->data3 . '_' .
+                        $log->data4;
+                })->values()
+            );
+        }
+
         $previousLogs = $employeesPreviousLogs->flatMap(
             fn($employee) =>
             $employee->Logs->map(fn($log) => [
@@ -87,6 +102,21 @@ class DailyTimeRecordController extends Controller
         ])->whereIn('id', $request->employee)
             ->with('flexiTime', 'nightShift')
             ->get();
+
+        // Remove exact duplicate logs (same fingerprint_id, date_time, and data fields)
+        foreach ($employees as $employee) {
+            $employee->setRelation(
+                'logs',
+                $employee->Logs->unique(function ($log) {
+                    return $log->fingerprint_id . '_' .
+                        $log->date_time . '_' .
+                        $log->data1 . '_' .
+                        $log->data2 . '_' .
+                        $log->data3 . '_' .
+                        $log->data4;
+                })->values()
+            );
+        }
 
         $allRecords = [];
 

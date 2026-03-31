@@ -14,11 +14,6 @@ use Carbon\Carbon;
 class LogsImport implements ToModel, WithHeadingRow, WithChunkReading, SkipsEmptyRows
 {
     /**
-     * @var array Store existing records to avoid duplicate queries
-     */
-    private $existingRecords = [];
-
-    /**
      * @var array Collect rows for batch insertion
      */
     private $batchData = [];
@@ -42,18 +37,7 @@ class LogsImport implements ToModel, WithHeadingRow, WithChunkReading, SkipsEmpt
             $convertedDate = Carbon::parse($row['date_time'])->format('Y-m-d H:i:s');
         }
 
-        // Create a unique key for this record
-        $uniqueKey = $row['fingerprint_id'] . '_' . $convertedDate;
-
-
-        if (isset($this->existingRecords[$uniqueKey])) {
-            return null;
-        }
-
-
-        $this->existingRecords[$uniqueKey] = true;
-
-
+        // Collect data for batch insert (no duplicate checking - allow all records)
         $this->batchData[] = [
             'fingerprint_id' => $row['fingerprint_id'],
             'date_time'      => $convertedDate,
@@ -75,7 +59,7 @@ class LogsImport implements ToModel, WithHeadingRow, WithChunkReading, SkipsEmpt
     }
 
     /**
-     * Insert collected batch data using upsert
+     * Insert collected batch data
      */
     private function insertBatch()
     {
@@ -84,24 +68,21 @@ class LogsImport implements ToModel, WithHeadingRow, WithChunkReading, SkipsEmpt
         }
 
         try {
-            DB::table('logs')->upsert(
-                $this->batchData,
-                ['fingerprint_id', 'date_time'], // Unique constraints
-                ['data1', 'data2', 'data3', 'data4', 'updated_at'] // Columns to update if duplicate
-            );
+            // Use insert instead of upsert to allow duplicate records
+            DB::table('logs')->insert($this->batchData);
             $this->batchData = [];
         } catch (\Exception $e) {
             \Illuminate\Support\Facades\Log::error('Batch insert failed: ' . $e->getMessage());
-            // Fallback to individual inserts if upsert fails
+            // Fallback to individual inserts if batch fails
             foreach ($this->batchData as $data) {
-                unset($data['created_at'], $data['updated_at']);
-                Log::firstOrCreate(
-                    [
-                        'fingerprint_id' => $data['fingerprint_id'],
-                        'date_time' => $data['date_time']
-                    ],
-                    $data
-                );
+                Log::create([
+                    'fingerprint_id' => $data['fingerprint_id'],
+                    'date_time' => $data['date_time'],
+                    'data1' => $data['data1'] ?? null,
+                    'data2' => $data['data2'] ?? null,
+                    'data3' => $data['data3'] ?? null,
+                    'data4' => $data['data4'] ?? null,
+                ]);
             }
             $this->batchData = [];
         }
