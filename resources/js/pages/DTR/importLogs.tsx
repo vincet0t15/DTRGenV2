@@ -21,7 +21,7 @@ export default function ImportLogs({ open, setOpen }: Props) {
     const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const file = e.target.files?.[0] || null;
         setData('file', file);
-        
+
         // Flag large files (over 50MB) for special handling information
         if (file && file.size > 50 * 1024 * 1024) {
             setIsLargeFile(true);
@@ -35,15 +35,16 @@ export default function ImportLogs({ open, setOpen }: Props) {
         post(route('dtr.import.logs'), {
             onSuccess: () => {
                 toast.success('Import started successfully');
-                
+
                 // For large files, provide additional information
                 if (isLargeFile) {
                     toast.info('Large file import in progress', {
-                        description: 'Your file is being processed in the background. You can continue using the application. You will receive a notification when the import is complete.',
-                        duration: 10000
+                        description:
+                            'Your file is being processed in the background. You can continue using the application. You will receive a notification when the import is complete.',
+                        duration: 10000,
                     });
                 }
-                
+
                 reset();
                 if (fileInputRef.current) {
                     fileInputRef.current.value = '';
@@ -52,9 +53,9 @@ export default function ImportLogs({ open, setOpen }: Props) {
             },
             onError: (errors) => {
                 toast.error('Import failed', {
-                    description: errors.file || 'An error occurred while starting the import process.'
+                    description: errors.file || 'An error occurred while starting the import process.',
                 });
-            }
+            },
         });
     };
 
@@ -63,28 +64,11 @@ export default function ImportLogs({ open, setOpen }: Props) {
             <AlertDialogContent>
                 <AlertDialogHeader>
                     <AlertDialogTitle>Import Employee Logs</AlertDialogTitle>
-                    <AlertDialogDescription>
-                        {isLargeFile ? (
-                            <div className="text-yellow-700">
-                                <p className="font-semibold">Large File Detected</p>
-                                <p>This file will be processed in the background. You can continue using the application while the import runs.</p>
-                                <p className="mt-2">Estimated processing time: Several minutes depending on file size.</p>
-                            </div>
-                        ) : (
-                            <p>Select an Excel file (.xlsx, .xls, .csv) to import employee logs.</p>
-                        )}
-                        <p className="mt-2">You will receive a notification when the import is complete.</p>
-                    </AlertDialogDescription>
+                    <AlertDialogDescription>You will receive a notification when the import is complete.</AlertDialogDescription>
                 </AlertDialogHeader>
 
                 <form onSubmit={submit}>
-                    <Input 
-                        type="file" 
-                        accept=".xlsx,.xls,.csv" 
-                        ref={fileInputRef} 
-                        onChange={handleFileChange} 
-                        disabled={processing}
-                    />
+                    <Input type="file" accept=".xlsx,.xls,.csv" ref={fileInputRef} onChange={handleFileChange} disabled={processing} />
 
                     <div className="mt-4 flex justify-end space-x-2">
                         <Button
@@ -97,18 +81,15 @@ export default function ImportLogs({ open, setOpen }: Props) {
                         >
                             Cancel
                         </Button>
-                        <Button 
-                            size={'sm'} 
-                            className="cursor-pointer rounded-sm" 
-                            type="submit" 
-                            disabled={processing || !data.file}
-                        >
+                        <Button size={'sm'} className="cursor-pointer rounded-sm" type="submit" disabled={processing || !data.file}>
                             {processing ? (
                                 <span className="flex items-center">
-                                    <span className="mr-2 h-3 w-3 rounded-full border-2 border-t-2 border-white border-t-transparent animate-spin"></span>
+                                    <span className="mr-2 h-3 w-3 animate-spin rounded-full border-2 border-t-2 border-white border-t-transparent"></span>
                                     Starting Import...
                                 </span>
-                            ) : 'Import'}
+                            ) : (
+                                'Import'
+                            )}
                         </Button>
                     </div>
                 </form>

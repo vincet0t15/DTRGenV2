@@ -367,11 +367,12 @@ class DailyTimeRecordController extends Controller
             'file' => 'required|file|mimes:xlsx,xls,csv'
         ]);
 
-        // Store the file temporarily
-        $filePath = $request->file('file')->store('temp');
+        Excel::import(new LogsImport(), $request->file('file'));
+        // // Store the file temporarily
+        // $filePath = $request->file('file')->store('temp');
 
-        // Dispatch the job to process the import in the background
-        ProcessLogsImport::dispatch($filePath);
+        // // Dispatch the job to process the import in the background
+        // ProcessLogsImport::dispatch($filePath);
 
         return redirect()->back()->withSuccess('Import started successfully. Large files are processed in the background and may take several minutes to complete.');
     }
